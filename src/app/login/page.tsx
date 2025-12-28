@@ -2,34 +2,22 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/db";
-import { z } from "zod";
-
-const emailSchema = z.object({
-  email: z.string().email(),
-});
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<"email" | "otp">("email");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    const result = emailSchema.safeParse({ email });
-    if (!result.success) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
+  const sendOtp = async () => {
     setLoading(true);
+    setError(null);
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
+        shouldCreateUser: true,
       },
     });
 
@@ -40,15 +28,33 @@ export default function LoginPage() {
       return;
     }
 
-    setSent(true);
+    setStep("otp");
+  };
+
+  const verifyOtp = async () => {
+    setLoading(true);
+    setError(null);
+
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: otp,
+      type: "email",
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setError("Invalid or expired code");
+      return;
+    }
+
+    // session is now created in browser cookies
+    window.location.href = "/";
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50">
-      <form
-        onSubmit={handleLogin}
-        className="w-full max-w-sm rounded-lg bg-white p-6 shadow"
-      >
+      <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow">
         <h1 className="mb-6 text-2xl font-semibold text-center">Login</h1>
 
         {error && (
@@ -57,32 +63,46 @@ export default function LoginPage() {
           </p>
         )}
 
-        {sent ? (
-          <p className="rounded bg-green-100 px-3 py-2 text-sm text-green-700">
-            Check your email for the login link ✉️
-          </p>
-        ) : (
+        {step === "email" ? (
           <>
-            <div className="mb-6">
-              <label className="mb-1 block text-sm">Email</label>
-              <input
-                type="email"
-                className="w-full rounded border px-3 py-2"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+            <label className="mb-1 block text-sm">Email</label>
+            <input
+              type="email"
+              className="mb-4 w-full rounded border px-3 py-2"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
             <button
+              onClick={sendOtp}
               disabled={loading}
-              className="w-full rounded bg-black py-2 text-white hover:bg-gray-800 disabled:opacity-50"
+              className="w-full rounded bg-black py-2 text-white disabled:opacity-50"
             >
-              {loading ? "Sending link..." : "Send login link"}
+              {loading ? "Sending code..." : "Send OTP"}
+            </button>
+          </>
+        ) : (
+          <>
+            <label className="mb-1 block text-sm">Enter 6-digit code</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={8} // allow 8 digits
+              className="mb-4 w-full rounded border px-3 py-2 text-center tracking-widest"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+
+            <button
+              onClick={verifyOtp}
+              disabled={loading}
+              className="w-full rounded bg-black py-2 text-white disabled:opacity-50"
+            >
+              {loading ? "Verifying..." : "Verify OTP"}
             </button>
           </>
         )}
-      </form>
+      </div>
     </div>
   );
 }
