@@ -3,10 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { supabase } from "@/lib/db";
+import type { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
+  // Handle scroll effect
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 60);
@@ -14,6 +18,23 @@ export default function Navbar() {
 
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Handle auth state
+  useEffect(() => {
+    // Get initial user
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+
+    // Listen for auth changes (login/logout)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   return (
@@ -60,16 +81,31 @@ export default function Navbar() {
             Tuition Fees
           </Link>
 
-          <Link
-            href="/login"
-            className={`${
-              scrolled
-                ? "text-green-600 hover:text-green-700"
-                : "text-green-300 hover:text-green-200"
-            }`}
-          >
-            Login
-          </Link>
+          {/* Auth */}
+          {user ? (
+            <Link
+              href="/account"
+              className={`truncate max-w-[180px] ${
+                scrolled
+                  ? "text-green-600 hover:text-green-700"
+                  : "text-green-300 hover:text-green-200"
+              }`}
+              title={user.email ?? ""}
+            >
+              {user.email}
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className={`${
+                scrolled
+                  ? "text-green-600 hover:text-green-700"
+                  : "text-green-300 hover:text-green-200"
+              }`}
+            >
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </nav>
