@@ -14,7 +14,6 @@ export default function Home() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [showArrow, setShowArrow] = useState(true);
 
-  // Scroll arrow effect
   useEffect(() => {
     const onScroll = () => {
       setShowArrow(window.scrollY < 20);
