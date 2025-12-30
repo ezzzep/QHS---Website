@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/db";
 import type { User } from "@supabase/supabase-js";
 
@@ -12,14 +13,28 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Scroll effect
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
-  // Auth state
+  /* ======================
+     Scroll effect (HOME ONLY)
+  ====================== */
+  useEffect(() => {
+    if (!isHome) return;
+
+    const onScroll = () => {
+      setScrolled(window.scrollY > 60);
+    };
+
+    window.addEventListener("scroll", onScroll);
+    onScroll(); // initial check
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
+
+  /* ======================
+     Auth state
+  ====================== */
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
@@ -35,7 +50,9 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Close dropdown on outside click
+  /* ======================
+     Close dropdown on outside click
+  ====================== */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (!dropdownRef.current?.contains(e.target as Node)) {
@@ -51,10 +68,12 @@ export default function Navbar() {
     await supabase.auth.signOut();
   };
 
+  const isSolid = !isHome || scrolled;
+
   return (
     <nav
       className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        scrolled ? "bg-white/90 shadow-sm backdrop-blur" : "bg-transparent"
+        isSolid ? "bg-white/90 shadow-sm backdrop-blur" : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -72,7 +91,7 @@ export default function Navbar() {
         {/* Navigation */}
         <div
           className={`flex items-center gap-10 text-sm md:text-base font-medium ${
-            scrolled ? "text-slate-700" : "text-white"
+            isSolid ? "text-slate-700" : "text-white"
           }`}
         >
           <Link href="/" className="hover:text-green-600">
@@ -97,7 +116,7 @@ export default function Navbar() {
               <button
                 onClick={() => setOpen(!open)}
                 className={`truncate max-w-[180px] ${
-                  scrolled
+                  isSolid
                     ? "text-green-600 hover:text-green-700"
                     : "text-green-300 hover:text-green-200"
                 }`}
@@ -129,7 +148,7 @@ export default function Navbar() {
             <Link
               href="/login"
               className={`${
-                scrolled
+                isSolid
                   ? "text-green-600 hover:text-green-700"
                   : "text-green-300 hover:text-green-200"
               }`}
