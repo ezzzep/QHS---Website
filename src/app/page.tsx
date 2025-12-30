@@ -27,6 +27,8 @@ export default function Home() {
   const [showArrow, setShowArrow] = useState(true);
 
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const [title, setTitle] = useState("");
@@ -71,11 +73,28 @@ export default function Home() {
         .order("created_at", { ascending: false });
 
       if (error) console.error("Fetch blogs error:", error);
-      if (data) setBlogs(data);
+      if (data) {
+        setBlogs(data);
+        setFilteredBlogs(data);
+      }
     };
 
     fetchBlogs();
   }, []);
+
+  /* ================= SEARCH FUNCTIONALITY ================= */
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredBlogs(blogs);
+    } else {
+      const filtered = blogs.filter(
+        (blog) =>
+          blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          blog.content.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredBlogs(filtered);
+    }
+  }, [searchQuery, blogs]);
 
   /* ================= IMAGE UPLOAD ================= */
   const uploadImage = async (file: File, bucket: string) => {
@@ -124,7 +143,7 @@ export default function Home() {
           .upload(filePath, coverImage);
         if (uploadError) throw uploadError;
 
-        const { data: publicUrlData } = supabase.storage
+        const { data: publicUrlData } = await supabase.storage
           .from("blog-images")
           .getPublicUrl(filePath);
         coverImageUrl = publicUrlData.publicUrl;
@@ -150,7 +169,9 @@ export default function Home() {
       }
 
       // Update local state
-      setBlogs((prev) => [data, ...prev]);
+      const newBlogs = [data, ...blogs];
+      setBlogs(newBlogs);
+      setFilteredBlogs(newBlogs);
       setShowModal(false);
       setTitle("");
       setContent("");
@@ -180,7 +201,7 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 text-center px-6 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <h1 className="animate-fade-in-down text-5xl md:text-7xl lg:text-8xl font-extrabold text-white">
             Queen of Heaven
           </h1>
@@ -219,77 +240,121 @@ export default function Home() {
 
       {/* BLOG SECTION */}
       <section id="features" className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6">
-          {profile?.role === "admin" && (
-            <div className="flex justify-between mb-8">
-              <h2 className="text-4xl font-bold">School Blog</h2>
-              <button
-                onClick={() => setShowModal(true)}
-                className="bg-yellow-500 px-6 py-3 rounded-full font-bold"
-              >
-                + Add Blog
-              </button>
-            </div>
-          )}
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+            <h2 className="text-4xl font-bold text-gray-800">School Blog</h2>
 
-          <div className="space-y-8">
-            {blogs.map((blog) => (
-              <div
-                key={blog.id}
-                onClick={() => handleBlogClick(blog.id)}
-                className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
-              >
-                <div className="flex flex-col md:flex-row">
-                  {blog.cover_image_url && (
-                    <div className="md:w-1/3 h-48 md:h-auto">
-                      <img
-                        src={blog.cover_image_url}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <div className="p-6 md:w-2/3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-2xl font-semibold">{blog.title}</h3>
-                      {blog.author_image && (
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <div className="relative w-full sm:w-auto">
+                <input
+                  type="text"
+                  placeholder="Search blogs..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full sm:w-80 pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors text-gray-700 placeholder-gray-400"
+                />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+
+              {profile?.role === "admin" && (
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2.5 px-6 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg whitespace-nowrap"
+                >
+                  + Add Blog
+                </button>
+              )}
+            </div>
+          </div>
+
+          {filteredBlogs.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">
+                {searchQuery
+                  ? "No blogs found matching your search."
+                  : "No blogs available yet."}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {filteredBlogs.map((blog) => (
+                <div
+                  key={blog.id}
+                  onClick={() => handleBlogClick(blog.id)}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl min-h-[280px]"
+                >
+                  <div className="flex flex-col md:flex-row h-full">
+                    {blog.cover_image_url && (
+                      <div className="md:w-1/3 h-64 md:h-auto min-h-[280px]">
                         <img
-                          src={blog.author_image}
-                          className="w-12 h-12 rounded-full ml-4"
+                          src={blog.cover_image_url}
+                          className="h-full w-full object-cover"
                         />
-                      )}
-                    </div>
-                    <p className="text-gray-600 line-clamp-3 mb-3">
-                      {blog.content}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-500">
-                        {new Date(blog.created_at).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </p>
-                      <button className="text-green-600 hover:text-green-700 font-medium flex items-center">
-                        Read More
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 ml-1"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
+                      </div>
+                    )}
+                    <div className="p-8 md:w-2/3 flex flex-col justify-between h-full">
+                      <div>
+                        <div className="flex items-start justify-between mb-4">
+                          <h3 className="text-2xl font-semibold text-gray-800">
+                            {blog.title}
+                          </h3>
+                          {blog.author_image && (
+                            <img
+                              src={blog.author_image}
+                              className="w-12 h-12 rounded-full ml-4"
+                            />
+                          )}
+                        </div>
+                        <p className="text-gray-600 line-clamp-4 mb-4 text-base leading-relaxed">
+                          {blog.content}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <p className="text-sm text-gray-500">
+                          {new Date(blog.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </p>
+                        <button className="text-green-600 hover:text-green-700 font-medium flex items-center">
+                          Read More
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 ml-1"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
