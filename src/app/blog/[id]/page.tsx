@@ -8,6 +8,7 @@ interface Blog {
   id: string;
   title: string;
   content: string;
+  author_name: string; // Added author_name field
   author_image_url: string | null;
   cover_image_url: string | null;
   created_at: string;
@@ -46,6 +47,7 @@ export default function BlogDetail() {
   const [isEditingBlog, setIsEditingBlog] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
+  const [editAuthorName, setEditAuthorName] = useState(""); // Added author name state
   const [editAuthorImage, setEditAuthorImage] = useState<File | null>(null);
   const [editCoverImage, setEditCoverImage] = useState<File | null>(null);
   const [savingBlog, setSavingBlog] = useState(false);
@@ -95,6 +97,7 @@ export default function BlogDetail() {
           // Initialize edit state with current blog data
           setEditTitle(data.title);
           setEditContent(data.content);
+          setEditAuthorName(data.author_name || "");
         }
       } catch {
         setError("Failed to load blog");
@@ -245,6 +248,7 @@ export default function BlogDetail() {
         .update({
           title: editTitle,
           content: editContent,
+          author_name: editAuthorName, // Added author_name to update
           author_image_url: authorImageUrl,
           cover_image_url: coverImageUrl,
         })
@@ -375,7 +379,7 @@ export default function BlogDetail() {
       }
 
       // Get user profile for the new comment
-      const { data: profile } = await supabase
+      const { data: userProfile } = await supabase
         .from("profiles")
         .select("full_name, avatar_url")
         .eq("id", user.id)
@@ -388,8 +392,9 @@ export default function BlogDetail() {
         blog_id: blogId,
         user_id: user.id,
         created_at: data.created_at,
-        user_name: profile?.full_name || user.email?.split("@")[0] || "User",
-        user_image: profile?.avatar_url || null,
+        user_name:
+          userProfile?.full_name || user.email?.split("@")[0] || "User",
+        user_image: userProfile?.avatar_url || null,
       };
 
       setComments([newCommentObj, ...comments]);
@@ -423,7 +428,7 @@ export default function BlogDetail() {
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => router.push("/")}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-colors cursor-pointer"
           >
             Back to Home
           </button>
@@ -433,7 +438,7 @@ export default function BlogDetail() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 pt-8 ">
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4"></div>
       </div>
@@ -453,6 +458,18 @@ export default function BlogDetail() {
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-green-700 font-semibold mb-2">
+                  Author Name
+                </label>
+                <input
+                  value={editAuthorName}
+                  onChange={(e) => setEditAuthorName(e.target.value)}
+                  className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 outline-none"
+                  placeholder="Enter author name"
                 />
               </div>
 
@@ -564,17 +581,18 @@ export default function BlogDetail() {
                     setIsEditingBlog(false);
                     setEditTitle(blog.title);
                     setEditContent(blog.content);
+                    setEditAuthorName(blog.author_name || "");
                     setEditAuthorImage(null);
                     setEditCoverImage(null);
                   }}
-                  className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                  className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateBlog}
                   disabled={savingBlog}
-                  className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50"
+                  className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer"
                 >
                   {savingBlog ? "Saving..." : "Save Changes"}
                 </button>
@@ -589,14 +607,14 @@ export default function BlogDetail() {
                 <img
                   src={blog.cover_image_url}
                   alt={blog.title}
-                  className="w-full h-64 md:h-96 object-cover"
+                  className="w-full h-140 md:h-140 object-cover"
                 />
               </div>
             )}
 
             <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
               <div className="flex justify-between items-start mb-4">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+                <h1 className="text-4xl md:text-4xl font-bold text-gray-900">
                   {blog.title}
                 </h1>
                 <div className="flex gap-2">
@@ -604,7 +622,7 @@ export default function BlogDetail() {
                     <>
                       <button
                         onClick={() => setIsEditingBlog(true)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors"
+                        className="bg-white border-2 border-blue-500 text-blue-500 p-2 rounded-lg transition-colors cursor-pointer hover:bg-blue-500 hover:text-white"
                         title="Edit blog"
                       >
                         <svg
@@ -619,7 +637,7 @@ export default function BlogDetail() {
                       <button
                         onClick={handleDeleteBlog}
                         disabled={deletingBlog}
-                        className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white p-2 rounded-lg transition-colors"
+                        className="bg-white border-2 border-red-500 text-red-500 p-2 rounded-lg transition-colors cursor-pointer hover:bg-red-500 hover:text-white disabled:border-red-300 disabled:text-red-300"
                         title="Delete blog"
                       >
                         <svg
@@ -645,12 +663,15 @@ export default function BlogDetail() {
                     <img
                       src={blog.author_image_url}
                       alt="Author"
-                      className="w-12 h-12 rounded-full mr-3 object-cover"
+                      className="w-24 h-24 rounded-full mr-3 object-cover"
                     />
                   )}
                   <div>
-                    <p className="text-sm text-gray-600">Published on</p>
+                    <p className="text-sm text-gray-600">Published by</p>
                     <p className="text-gray-800 font-medium">
+                      {blog.author_name || "Anonymous"}
+                    </p>
+                    <p className="text-sm text-gray-600">
                       {new Date(blog.created_at).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
@@ -662,7 +683,10 @@ export default function BlogDetail() {
               </div>
               <div className="prose prose-lg max-w-none">
                 {blog.content.split("\n").map((paragraph, index) => (
-                  <p key={index} className="mb-4 text-gray-700 leading-relaxed">
+                  <p
+                    key={index}
+                    className="mb-4 text-gray-700 leading-relaxed text-md tracking-wide"
+                  >
                     {paragraph}
                   </p>
                 ))}
@@ -688,7 +712,7 @@ export default function BlogDetail() {
                 <div className="flex-1">
                   <textarea
                     rows={3}
-                    className="w-full border border-gray-300 rounded-lg p-3 mb-2 focus:ring-2 focus:ring-green-500 outline-none"
+                    className="w-full border border-gray-300 text-gray-900 rounded-lg p-3 mb-2 focus:ring-2 focus:ring-green-500 outline-none"
                     placeholder="Share your thoughts..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
@@ -697,7 +721,7 @@ export default function BlogDetail() {
                     <button
                       type="submit"
                       disabled={!newComment.trim() || submittingComment}
-                      className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                      className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-colors cursor-pointer"
                     >
                       {submittingComment ? "Posting..." : "Post Comment"}
                     </button>
@@ -712,7 +736,7 @@ export default function BlogDetail() {
               </p>
               <button
                 onClick={() => router.push("/login")}
-                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors cursor-pointer"
               >
                 Log In
               </button>
@@ -760,7 +784,7 @@ export default function BlogDetail() {
                           onClick={() =>
                             handleDeleteComment(comment.id, comment.user_id)
                           }
-                          className="text-red-500 hover:text-red-700 transition-colors p-1"
+                          className="bg-white border-2 border-red-500 text-red-500 p-1 rounded transition-colors cursor-pointer hover:bg-red-500 hover:text-white"
                           title={
                             user && user.id === comment.user_id
                               ? "Delete your comment"

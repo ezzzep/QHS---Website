@@ -13,6 +13,7 @@ interface Blog {
   id: string;
   title: string;
   content: string;
+  author_name: string; // Added author_name field
   author_image: string | null;
   cover_image_url: string | null;
   created_at: string;
@@ -30,9 +31,11 @@ export default function Home() {
   const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // Added saving state
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [authorName, setAuthorName] = useState(""); // Added authorName state
   const [authorImage, setAuthorImage] = useState<File | null>(null);
   const [coverImage, setCoverImage] = useState<File | null>(null);
 
@@ -54,11 +57,13 @@ export default function Home() {
       if (user) {
         const { data, error } = await supabase
           .from("profiles")
-          .select("role")
+          .select("role, full_name")
           .eq("id", user.id)
           .single();
         if (error) console.error("Profile fetch error:", error);
-        if (data) setProfile(data);
+        if (data) {
+          setProfile(data);
+        }
       }
     };
     loadUser();
@@ -117,6 +122,8 @@ export default function Home() {
   const handleSaveBlog = async () => {
     if (!title || !content || !user) return;
 
+    setIsSaving(true); // Set saving state to true
+
     try {
       let authorImageUrl: string | null = null;
       let coverImageUrl: string | null = null;
@@ -155,6 +162,7 @@ export default function Home() {
         .insert({
           title,
           content,
+          author_name: authorName, // Added author_name to the insert
           author_image_url: authorImageUrl,
           cover_image_url: coverImageUrl,
           author_id: user.id,
@@ -175,12 +183,15 @@ export default function Home() {
       setShowModal(false);
       setTitle("");
       setContent("");
+      setAuthorName(""); // Reset author name
       setAuthorImage(null);
       setCoverImage(null);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Upload or insert error:", err);
       alert(`Upload or insert error: ${err.message}`);
+    } finally {
+      setIsSaving(false); // Reset saving state
     }
   };
 
@@ -215,7 +226,7 @@ export default function Home() {
           <div className="animate-fade-in-up mt-10">
             <a
               href="#features"
-              className="inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-4 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg hover:shadow-xl"
+              className="inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-4 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg hover:shadow-xl cursor-pointer"
             >
               Discover More
             </a>
@@ -242,7 +253,9 @@ export default function Home() {
       <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
-            <h2 className="text-4xl font-bold text-gray-800">School Blog</h2>
+            <h2 className="text-4xl font-bold text-gray-800">
+              Insightful Reads
+            </h2>
 
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <div className="relative w-full sm:w-auto">
@@ -272,7 +285,7 @@ export default function Home() {
               {profile?.role === "admin" && (
                 <button
                   onClick={() => setShowModal(true)}
-                  className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2.5 px-6 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg whitespace-nowrap"
+                  className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2.5 px-6 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg whitespace-nowrap cursor-pointer"
                 >
                   + Add Blog
                 </button>
@@ -323,17 +336,24 @@ export default function Home() {
                         </p>
                       </div>
                       <div className="flex items-center justify-between mt-4">
-                        <p className="text-sm text-gray-500">
-                          {new Date(blog.created_at).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
+                        <div>
+                          {blog.author_name && (
+                            <p className="text-sm text-gray-600 mb-1">
+                              By {blog.author_name}
+                            </p>
                           )}
-                        </p>
-                        <button className="text-green-600 hover:text-green-700 font-medium flex items-center">
+                          <p className="text-sm text-gray-500">
+                            {new Date(blog.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </p>
+                        </div>
+                        <button className="text-green-600 hover:text-green-700 font-medium flex items-center cursor-pointer">
                           Read More
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -369,7 +389,7 @@ export default function Home() {
               </h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
+                className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -400,6 +420,18 @@ export default function Home() {
                     className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-green-700 font-semibold mb-2">
+                    Author Name
+                  </label>
+                  <input
+                    placeholder="Enter author name"
+                    className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none"
+                    value={authorName}
+                    onChange={(e) => setAuthorName(e.target.value)}
                   />
                 </div>
 
@@ -506,16 +538,25 @@ export default function Home() {
             {/* Footer */}
             <div className="flex justify-end gap-3 p-6 border-t border-green-100 bg-green-50/50">
               <button
-                onClick={() => setShowModal(false)}
-                className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                onClick={() => {
+                  setShowModal(false);
+                  // Reset form fields when canceling
+                  setTitle("");
+                  setContent("");
+                  setAuthorName("");
+                  setAuthorImage(null);
+                  setCoverImage(null);
+                }}
+                className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveBlog}
-                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg"
+                disabled={isSaving}
+                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg cursor-pointer disabled:opacity-50"
               >
-                Save Blog
+                {isSaving ? "Saving..." : "Save Blog"}
               </button>
             </div>
           </div>
