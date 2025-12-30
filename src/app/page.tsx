@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/db";
 
 interface Profile {
@@ -14,9 +15,12 @@ interface Blog {
   content: string;
   author_image: string | null;
   cover_image_url: string | null;
+  created_at: string;
+  author_id: string;
 }
 
 export default function Home() {
+  const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -159,9 +163,13 @@ export default function Home() {
     }
   };
 
+  /* ================= HANDLE BLOG CLICK ================= */
+  const handleBlogClick = (blogId: string) => {
+    router.push(`/blog/${blogId}`);
+  };
+
   return (
     <main className="font-sans bg-white">
-
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <Image
           src="/images/hero.jpg"
@@ -210,8 +218,8 @@ export default function Home() {
       </section>
 
       {/* BLOG SECTION */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="features" className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-6">
           {profile?.role === "admin" && (
             <div className="flex justify-between mb-8">
               <h2 className="text-4xl font-bold">School Blog</h2>
@@ -224,27 +232,60 @@ export default function Home() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="space-y-8">
             {blogs.map((blog) => (
               <div
                 key={blog.id}
-                className="bg-white rounded-xl shadow-lg overflow-hidden"
+                onClick={() => handleBlogClick(blog.id)}
+                className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
               >
-                {blog.cover_image_url && (
-                  <img
-                    src={blog.cover_image_url}
-                    className="h-48 w-full object-cover"
-                  />
-                )}
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">{blog.title}</h3>
-                  <p className="text-gray-600 line-clamp-4">{blog.content}</p>
-                  {blog.author_image && (
-                    <img
-                      src={blog.author_image}
-                      className="w-10 h-10 rounded-full mt-4"
-                    />
+                <div className="flex flex-col md:flex-row">
+                  {blog.cover_image_url && (
+                    <div className="md:w-1/3 h-48 md:h-auto">
+                      <img
+                        src={blog.cover_image_url}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
                   )}
+                  <div className="p-6 md:w-2/3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-2xl font-semibold">{blog.title}</h3>
+                      {blog.author_image && (
+                        <img
+                          src={blog.author_image}
+                          className="w-12 h-12 rounded-full ml-4"
+                        />
+                      )}
+                    </div>
+                    <p className="text-gray-600 line-clamp-3 mb-3">
+                      {blog.content}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-gray-500">
+                        {new Date(blog.created_at).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                      <button className="text-green-600 hover:text-green-700 font-medium flex items-center">
+                        Read More
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 ml-1"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -254,51 +295,162 @@ export default function Home() {
 
       {/* MODAL */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg">
-            <h3 className="text-2xl font-bold mb-4">Add Blog</h3>
-
-            <input
-              placeholder="Title"
-              className="w-full border p-2 mb-3"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-
-            <textarea
-              placeholder="Content"
-              className="w-full border p-2 mb-3"
-              rows={4}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
-
-            <label className="block mb-2 font-semibold">Author Image:</label>
-            <input
-              type="file"
-              onChange={(e) => setAuthorImage(e.target.files?.[0] || null)}
-            />
-
-            <label className="block mt-3 mb-2 font-semibold">
-              Cover Image:
-            </label>
-            <input
-              type="file"
-              onChange={(e) => setCoverImage(e.target.files?.[0] || null)}
-            />
-
-            <div className="flex justify-end gap-4 mt-6">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-green-50 to-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-2xl transform transition-all flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-green-100">
+              <h3 className="text-2xl md:text-3xl font-bold text-green-800">
+                Add Blog
+              </h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 border rounded"
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-green-700 font-semibold mb-2">
+                    Title
+                  </label>
+                  <input
+                    placeholder="Enter blog title"
+                    className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-green-700 font-semibold mb-2">
+                    Content
+                  </label>
+                  <textarea
+                    placeholder="Write your blog content here. You can write multiple paragraphs..."
+                    className="w-full border-2 border-green-200 focus:border-green-500 p-4 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none resize-none min-h-[250px] md:min-h-[300px]"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-green-700 font-semibold mb-2">
+                      Author Image
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        id="author-image"
+                        className="hidden"
+                        onChange={(e) =>
+                          setAuthorImage(e.target.files?.[0] || null)
+                        }
+                      />
+                      <label
+                        htmlFor="author-image"
+                        className="flex items-center justify-center w-full border-2 border-dashed border-green-300 rounded-lg p-3 cursor-pointer hover:bg-green-50 transition-colors"
+                      >
+                        <div className="text-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 mx-auto text-green-500 mb-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                          </svg>
+                          <p className="text-green-700 text-sm font-medium truncate">
+                            {authorImage
+                              ? authorImage.name
+                              : "Choose author image"}
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-green-700 font-semibold mb-2">
+                      Cover Image
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        id="cover-image"
+                        className="hidden"
+                        onChange={(e) =>
+                          setCoverImage(e.target.files?.[0] || null)
+                        }
+                      />
+                      <label
+                        htmlFor="cover-image"
+                        className="flex items-center justify-center w-full border-2 border-dashed border-green-300 rounded-lg p-3 cursor-pointer hover:bg-green-50 transition-colors"
+                      >
+                        <div className="text-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 mx-auto text-green-500 mb-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                          </svg>
+                          <p className="text-green-700 text-sm font-medium truncate">
+                            {coverImage
+                              ? coverImage.name
+                              : "Choose cover image"}
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 p-6 border-t border-green-100 bg-green-50/50">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveBlog}
-                className="bg-green-600 text-white px-4 py-2 rounded"
+                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg"
               >
-                Save
+                Save Blog
               </button>
             </div>
           </div>
