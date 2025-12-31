@@ -253,7 +253,7 @@ export default function BlogDetail() {
                 <div className="flex gap-2">
                   {/* Facebook Share Button */}
                   <button
-                    onClick={shareToFacebook}
+                    onClick={() => shareToFacebook(blog.id)}
                     className="bg-white border-2 border-blue-600 text-blue-600 p-2 rounded-lg transition-colors cursor-pointer hover:bg-blue-600 hover:text-white"
                     title="Share on Facebook"
                   >
