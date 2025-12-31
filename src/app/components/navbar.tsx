@@ -16,9 +16,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
 
-  /* ======================
-     Scroll effect (HOME ONLY)
-  ====================== */
   useEffect(() => {
     if (!isHome) return;
 
@@ -52,9 +49,6 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, []);
 
-  /* ======================
-     Close dropdown on outside click
-  ====================== */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (!dropdownRef.current?.contains(e.target as Node)) {
@@ -98,19 +92,21 @@ export default function Navbar() {
           <Link href="/" className="hover:text-green-600">
             Home
           </Link>
+          <Link href="/faculty" className="hover:text-green-600">
+            Admin & Faculty
+          </Link>
+          <Link href="/tuition" className="hover:text-green-600">
+            Tuition Fees
+          </Link>{" "}
           <Link href="/about" className="hover:text-green-600">
             About Us
           </Link>
-          <Link href="/faculty" className="hover:text-green-600">
-            Admin & Faculty
+          <Link href="/contact" className="hover:text-green-600">
+            Contact
           </Link>
           <Link href="/alumni" className="hover:text-green-600">
             Alumni
           </Link>
-          <Link href="/tuition" className="hover:text-green-600">
-            Tuition Fees
-          </Link>
-
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
