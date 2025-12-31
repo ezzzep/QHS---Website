@@ -42,7 +42,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://mail.google.com/mail/?view=cm&fs=1&to=josephdaing@gmail.com"
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=queenofheavenschool@gmail.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Email"
