@@ -21,18 +21,26 @@ export const useAuth = () => {
         if (user) {
           const { data, error } = await supabase
             .from("profiles")
-            .select("role")
+            .select("role, full_name, avatar_url")
             .eq("id", user.id)
             .single();
-          if (error) console.error("Profile fetch error:", error);
-          if (data) setProfile(data);
+
+          if (error) {
+            console.error("Profile fetch error:", error);
+            setProfile({ role: "user" });
+          } else if (data) {
+            setProfile(data);
+          }
         }
-      } catch {
+      } catch (error) {
+        console.error("Unexpected auth error:", error);
         setUser(null);
+        setProfile(null);
       } finally {
         setLoading(false);
       }
     };
+
     fetchUser();
   }, []);
 

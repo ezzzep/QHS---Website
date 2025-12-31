@@ -1,203 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getBrowserSupabase } from "@/lib/db";
-
-const supabase = getBrowserSupabase();
-
-interface Profile {
-  role: string;
-}
-
-interface Blog {
-  id: string;
-  title: string;
-  content: string;
-  author_name: string; // Added author_name field
-  author_image: string | null;
-  cover_image_url: string | null;
-  created_at: string;
-  author_id: string;
-}
+import { useAuth } from "@/hooks/useAuth";
+import { useHomeBlogs } from "@/hooks/useHomeBlog";
+import { useScrollArrow } from "@/hooks/useScrollArrow";
 
 export default function Home() {
   const router = useRouter();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [showArrow, setShowArrow] = useState(true);
+  const { user, profile } = useAuth();
+  const showArrow = useScrollArrow();
 
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [isSaving, setIsSaving] = useState(false); // Added saving state
+  const {
+    filteredBlogs,
+    searchQuery,
+    setSearchQuery,
+    showModal,
+    setShowModal,
+    isSaving,
+    title,
+    setTitle,
+    content,
+    setContent,
+    authorName,
+    setAuthorName,
+    authorImage,
+    setAuthorImage,
+    coverImage,
+    setCoverImage,
+    handleSaveBlog,
+    handleCancel,
+  } = useHomeBlogs(user);
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [authorName, setAuthorName] = useState(""); // Added authorName state
-  const [authorImage, setAuthorImage] = useState<File | null>(null);
-  const [coverImage, setCoverImage] = useState<File | null>(null);
-
-  /* ================= SCROLL ARROW ================= */
-  useEffect(() => {
-    const onScroll = () => setShowArrow(window.scrollY < 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  /* ================= AUTH + PROFILE ================= */
-  useEffect(() => {
-    const loadUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-
-      if (user) {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("role, full_name")
-          .eq("id", user.id)
-          .single();
-        if (error) console.error("Profile fetch error:", error);
-        if (data) {
-          setProfile(data);
-        }
-      }
-    };
-    loadUser();
-  }, []);
-
-  /* ================= FETCH BLOGS ================= */
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      const { data, error } = await supabase
-        .from("blogs")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) console.error("Fetch blogs error:", error);
-      if (data) {
-        setBlogs(data);
-        setFilteredBlogs(data);
-      }
-    };
-
-    fetchBlogs();
-  }, []);
-
-  /* ================= SEARCH FUNCTIONALITY ================= */
-  useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredBlogs(blogs);
-    } else {
-      const filtered = blogs.filter(
-        (blog) =>
-          blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          blog.content.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredBlogs(filtered);
-    }
-  }, [searchQuery, blogs]);
-
-  /* ================= IMAGE UPLOAD ================= */
-  const uploadImage = async (file: File, bucket: string) => {
-    const filePath = `${Date.now()}-${file.name}`;
-    try {
-      const { error } = await supabase.storage
-        .from(bucket)
-        .upload(filePath, file);
-      if (error) throw error;
-
-      const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
-      return data.publicUrl;
-    } catch (err) {
-      console.error(`Error uploading to ${bucket}:`, err);
-      return null;
-    }
-  };
-
-  /* ================= SAVE BLOG ================= */
-  const handleSaveBlog = async () => {
-    if (!title || !content || !user) return;
-
-    setIsSaving(true); // Set saving state to true
-
-    try {
-      let authorImageUrl: string | null = null;
-      let coverImageUrl: string | null = null;
-
-      // Upload author image
-      if (authorImage) {
-        const filePath = `author-images/${Date.now()}-${authorImage.name}`;
-        const { error: uploadError, data: uploadData } = await supabase.storage
-          .from("author-images")
-          .upload(filePath, authorImage);
-        if (uploadError) throw uploadError;
-
-        const { data: publicUrlData } = supabase.storage
-          .from("author-images")
-          .getPublicUrl(filePath);
-        authorImageUrl = publicUrlData.publicUrl;
-      }
-
-      // Upload cover image
-      if (coverImage) {
-        const filePath = `blog-images/${Date.now()}-${coverImage.name}`;
-        const { error: uploadError, data: uploadData } = await supabase.storage
-          .from("blog-images")
-          .upload(filePath, coverImage);
-        if (uploadError) throw uploadError;
-
-        const { data: publicUrlData } = await supabase.storage
-          .from("blog-images")
-          .getPublicUrl(filePath);
-        coverImageUrl = publicUrlData.publicUrl;
-      }
-
-      // Insert blog
-      const { data, error } = await supabase
-        .from("blogs")
-        .insert({
-          title,
-          content,
-          author_name: authorName, // Added author_name to the insert
-          author_image_url: authorImageUrl,
-          cover_image_url: coverImageUrl,
-          author_id: user.id,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Insert blog error:", error);
-        alert(`Insert failed: ${error.message}`);
-        return;
-      }
-
-      // Update local state
-      const newBlogs = [data, ...blogs];
-      setBlogs(newBlogs);
-      setFilteredBlogs(newBlogs);
-      setShowModal(false);
-      setTitle("");
-      setContent("");
-      setAuthorName(""); // Reset author name
-      setAuthorImage(null);
-      setCoverImage(null);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      console.error("Upload or insert error:", err);
-      alert(`Upload or insert error: ${err.message}`);
-    } finally {
-      setIsSaving(false); // Reset saving state
-    }
-  };
-
-  /* ================= HANDLE BLOG CLICK ================= */
   const handleBlogClick = (blogId: string) => {
     router.push(`/blog/${blogId}`);
   };
@@ -223,14 +57,14 @@ export default function Home() {
           </span>
           <p className="animate-fade-in-up mt-4 text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
             Nurturing minds, building character, and inspiring excellence since
-            1995.
+            2002.
           </p>
           <div className="animate-fade-in-up mt-10">
             <a
-              href="#features"
+              href="/contact"
               className="inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-4 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg hover:shadow-xl cursor-pointer"
             >
-              Discover More
+              Contact Us
             </a>
           </div>
         </div>
@@ -326,12 +160,6 @@ export default function Home() {
                           <h3 className="text-2xl font-semibold text-gray-800">
                             {blog.title}
                           </h3>
-                          {blog.author_image && (
-                            <img
-                              src={blog.author_image}
-                              className="w-12 h-12 rounded-full ml-4"
-                            />
-                          )}
                         </div>
                         <p className="text-gray-600 line-clamp-4 mb-4 text-base leading-relaxed">
                           {blog.content}
@@ -390,7 +218,7 @@ export default function Home() {
                 Add Blog
               </h3>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={handleCancel}
                 className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
               >
                 <svg
@@ -540,15 +368,7 @@ export default function Home() {
             {/* Footer */}
             <div className="flex justify-end gap-3 p-6 border-t border-green-100 bg-green-50/50">
               <button
-                onClick={() => {
-                  setShowModal(false);
-                  // Reset form fields when canceling
-                  setTitle("");
-                  setContent("");
-                  setAuthorName("");
-                  setAuthorImage(null);
-                  setCoverImage(null);
-                }}
+                onClick={handleCancel}
                 className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 Cancel
