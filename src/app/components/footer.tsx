@@ -8,7 +8,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-white border-t border-gray-200">
+    <footer className="bg-white">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div className="space-y-5">
@@ -33,7 +33,6 @@ export default function Footer() {
             </p>
 
             <div className="flex gap-5 pt-2 text-teal-600">
-
               <a
                 href="https://www.facebook.com/profile.php?id=100069498575852"
                 aria-label="Facebook"
@@ -43,7 +42,9 @@ export default function Footer() {
               </a>
 
               <a
-                href="mailto:queenofheavenschool@gmail.com"
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=josephdaing@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Email"
                 className="hover:text-teal-700 transition"
               >

@@ -252,7 +252,7 @@ export default function Home() {
       </section>
 
       {/* BLOG SECTION */}
-      <section id="features" className="py-20 bg-gray-50">
+      <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
             <h2 className="text-4xl font-bold text-gray-800">
