@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Head from "next/head";
-import { supabase } from "@/lib/db";
 import { Share2 } from "lucide-react";
+import { getBrowserSupabase } from "@/lib/db";
+
+const supabase = getBrowserSupabase();
 
 interface Blog {
   id: string;
