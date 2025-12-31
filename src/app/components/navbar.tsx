@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { supabase } from "@/lib/db";
 import type { User } from "@supabase/supabase-js";
+import { getBrowserSupabase } from "@/lib/db";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -27,15 +27,17 @@ export default function Navbar() {
     };
 
     window.addEventListener("scroll", onScroll);
-    onScroll(); // initial check
+    onScroll();
 
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
   /* ======================
-     Auth state
+     Auth state (CLIENT ONLY)
   ====================== */
   useEffect(() => {
+    const supabase = getBrowserSupabase();
+
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
     });
@@ -65,6 +67,7 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = async () => {
+    const supabase = getBrowserSupabase();
     await supabase.auth.signOut();
   };
 
@@ -77,7 +80,6 @@ export default function Navbar() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/images/logo.png"
@@ -88,7 +90,6 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* Navigation */}
         <div
           className={`flex items-center gap-10 text-sm md:text-base font-medium ${
             isSolid ? "text-slate-700" : "text-white"
@@ -110,7 +111,6 @@ export default function Navbar() {
             Tuition Fees
           </Link>
 
-          {/* Auth */}
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
