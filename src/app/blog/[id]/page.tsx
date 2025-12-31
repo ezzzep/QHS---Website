@@ -1,431 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Share2 } from "lucide-react";
-import { getBrowserSupabase } from "@/lib/db";
-
-const supabase = getBrowserSupabase();
-interface Blog {
-  id: string;
-  title: string;
-  content: string;
-  author_name: string;
-  author_image_url: string | null;
-  cover_image_url: string | null;
-  created_at: string;
-  author_id: string;
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  blog_id: string;
-  user_id: string;
-  created_at: string;
-  user_name: string;
-  user_image: string | null;
-}
-
-interface Profile {
-  role: string;
-}
+import { useAuth } from "@/hooks/useAuth";
+import { useBlog } from "@/hooks/useBlog";
+import { useComments } from "@/hooks/useComments";
+import { shareToFacebook } from "@/utils/sharing";
 
 export default function BlogDetail() {
-  const params = useParams();
   const router = useRouter();
-  const blogId = params.id as string;
+  const { user, profile, loading: authLoading } = useAuth();
+  const {
+    blog,
+    loading: blogLoading,
+    error,
+    isEditingBlog,
+    editTitle,
+    setEditTitle,
+    editContent,
+    setEditContent,
+    editAuthorName,
+    setEditAuthorName,
+    editAuthorImage,
+    setEditAuthorImage,
+    editCoverImage,
+    setEditCoverImage,
+    savingBlog,
+    deletingBlog,
+    setIsEditingBlog,
+    handleUpdateBlog,
+    handleDeleteBlog,
+    cancelEditing,
+  } = useBlog();
 
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const {
+    comments,
+    loading: commentsLoading,
+    handleCommentSubmit,
+    handleDeleteComment,
+  } = useComments(blog?.id || "", user);
+
   const [newComment, setNewComment] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
 
-  // Edit blog state
-  const [isEditingBlog, setIsEditingBlog] = useState(false);
-  const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [editAuthorName, setEditAuthorName] = useState("");
-  const [editAuthorImage, setEditAuthorImage] = useState<File | null>(null);
-  const [editCoverImage, setEditCoverImage] = useState<File | null>(null);
-  const [savingBlog, setSavingBlog] = useState(false);
-  const [deletingBlog, setDeletingBlog] = useState(false);
-
-  // Fetch current user
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        setUser(user);
-
-        if (user) {
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("role")
-            .eq("id", user.id)
-            .single();
-          if (error) console.error("Profile fetch error:", error);
-          if (data) setProfile(data);
-        }
-      } catch {
-        setUser(null);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  // Fetch blog details and comments
-  useEffect(() => {
-    if (!blogId) return;
-
-    const fetchBlog = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("blogs")
-          .select("*")
-          .eq("id", blogId)
-          .single();
-
-        if (error || !data) {
-          setError("Blog not found");
-        } else {
-          setBlog(data);
-          // Initialize edit state with current blog data
-          setEditTitle(data.title);
-          setEditContent(data.content);
-          setEditAuthorName(data.author_name || "");
-        }
-      } catch {
-        setError("Failed to load blog");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchComments = async () => {
-      try {
-        // Fetch comments without user info first
-        const { data: commentsData, error: commentsError } = await supabase
-          .from("comments")
-          .select("*")
-          .eq("blog_id", blogId)
-          .order("created_at", { ascending: false });
-
-        if (commentsError) {
-          console.error("Error fetching comments:", commentsError);
-          setComments([]);
-          return;
-        }
-
-        if (!commentsData || commentsData.length === 0) {
-          setComments([]);
-          return;
-        }
-
-        // If user is not logged in, show all comments as anonymous
-        if (!user) {
-          const anonymousComments = commentsData.map((comment) => ({
-            id: comment.id,
-            content: comment.content,
-            blog_id: comment.blog_id,
-            user_id: comment.user_id,
-            created_at: comment.created_at,
-            user_name: "Anonymous",
-            user_image: null,
-          }));
-          setComments(anonymousComments);
-          return;
-        }
-
-        // If user is logged in, fetch actual user profiles
-        const userIds = [
-          ...new Set(commentsData.map((comment) => comment.user_id)),
-        ];
-
-        if (userIds.length === 0) {
-          setComments([]);
-          return;
-        }
-
-        const { data: profilesData, error: profilesError } = await supabase
-          .from("profiles")
-          .select("id, full_name, avatar_url")
-          .in("id", userIds);
-
-        if (profilesError) {
-          console.error("Error fetching profiles:", profilesError);
-          // If profiles fail, show as "User"
-          const transformedComments = commentsData.map((comment) => ({
-            id: comment.id,
-            content: comment.content,
-            blog_id: comment.blog_id,
-            user_id: comment.user_id,
-            created_at: comment.created_at,
-            user_name: "User",
-            user_image: null,
-          }));
-          setComments(transformedComments);
-          return;
-        }
-
-        // Create a map of user profiles
-        const profilesMap = new Map();
-        if (profilesData) {
-          profilesData.forEach((profile) => {
-            profilesMap.set(profile.id, profile);
-          });
-        }
-
-        // Transform the data with actual user names
-        const transformedComments = commentsData.map((comment) => {
-          const profile = profilesMap.get(comment.user_id);
-          return {
-            id: comment.id,
-            content: comment.content,
-            blog_id: comment.blog_id,
-            user_id: comment.user_id,
-            created_at: comment.created_at,
-            user_name: profile?.full_name || "User",
-            user_image: profile?.avatar_url || null,
-          };
-        });
-
-        setComments(transformedComments);
-      } catch (err) {
-        console.error("Unexpected error fetching comments:", err);
-        setComments([]);
-      }
-    };
-
-    fetchBlog();
-    fetchComments();
-  }, [blogId, user]);
-
-  // Handle blog update
-  const handleUpdateBlog = async () => {
-    if (!editTitle || !editContent || !user || !blog) return;
-
-    setSavingBlog(true);
-    try {
-      let authorImageUrl: string | null = blog.author_image_url;
-      let coverImageUrl: string | null = blog.cover_image_url;
-
-      // Upload author image if changed
-      if (editAuthorImage) {
-        const filePath = `author-images/${Date.now()}-${editAuthorImage.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from("author-images")
-          .upload(filePath, editAuthorImage);
-        if (uploadError) throw uploadError;
-
-        const { data: publicUrlData } = supabase.storage
-          .from("author-images")
-          .getPublicUrl(filePath);
-        authorImageUrl = publicUrlData.publicUrl;
-      }
-
-      // Upload cover image if changed
-      if (editCoverImage) {
-        const filePath = `blog-images/${Date.now()}-${editCoverImage.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from("blog-images")
-          .upload(filePath, editCoverImage);
-        if (uploadError) throw uploadError;
-
-        const { data: publicUrlData } = supabase.storage
-          .from("blog-images")
-          .getPublicUrl(filePath);
-        coverImageUrl = publicUrlData.publicUrl;
-      }
-
-      // Update blog
-      const { data, error } = await supabase
-        .from("blogs")
-        .update({
-          title: editTitle,
-          content: editContent,
-          author_name: editAuthorName,
-          author_image_url: authorImageUrl,
-          cover_image_url: coverImageUrl,
-        })
-        .eq("id", blog.id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Update blog error:", error);
-        alert(`Update failed: ${error.message}`);
-        return;
-      }
-
-      // Update local state
-      setBlog(data);
-      setIsEditingBlog(false);
-      setEditAuthorImage(null);
-      setEditCoverImage(null);
-    } catch (err: any) {
-      console.error("Update error:", err);
-      alert(`Update error: ${err.message}`);
-    } finally {
-      setSavingBlog(false);
-    }
-  };
-
-  // Handle blog deletion
-  const handleDeleteBlog = async () => {
-    if (!user || profile?.role !== "admin" || !blog) return;
-
-    if (
-      confirm(
-        "Are you sure you want to delete this blog? This action cannot be undone."
-      )
-    ) {
-      setDeletingBlog(true);
-      try {
-        // Delete all comments associated with this blog first
-        const { error: commentsError } = await supabase
-          .from("comments")
-          .delete()
-          .eq("blog_id", blog.id);
-
-        if (commentsError) {
-          console.error("Error deleting comments:", commentsError);
-        }
-
-        // Delete the blog
-        const { error } = await supabase
-          .from("blogs")
-          .delete()
-          .eq("id", blog.id);
-
-        if (error) {
-          console.error("Error deleting blog:", error);
-          alert("Failed to delete blog");
-          return;
-        }
-
-        // Redirect to home page
-        router.push("/");
-      } catch (err) {
-        console.error("Error:", err);
-        alert("Failed to delete blog");
-      } finally {
-        setDeletingBlog(false);
-      }
-    }
-  };
-
-  // Handle comment deletion
-  const handleDeleteComment = async (
-    commentId: string,
-    commentUserId: string
-  ) => {
-    // Check if user can delete this comment (either admin or comment owner)
-    const canDelete =
-      profile?.role === "admin" || (user && user.id === commentUserId);
-
-    if (!canDelete) {
-      alert("You don't have permission to delete this comment");
-      return;
-    }
-
-    if (confirm("Are you sure you want to delete this comment?")) {
-      try {
-        const { error } = await supabase
-          .from("comments")
-          .delete()
-          .eq("id", commentId);
-
-        if (error) {
-          console.error("Error deleting comment:", error);
-          alert("Failed to delete comment: " + error.message);
-          return;
-        }
-
-        // Update local state
-        setComments(comments.filter((comment) => comment.id !== commentId));
-      } catch (err) {
-        console.error("Error:", err);
-        alert("Failed to delete comment");
-      }
-    }
-  };
-
-  // Handle Facebook sharing
-  const handleShareToFacebook = () => {
-    if (!blog) return;
-
-    // Get the current URL
-    const url = window.location.href;
-
-    // Create Facebook share URL
-    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      url
-    )}`;
-
-    // Open Facebook share in a new tab
-    window.open(facebookShareUrl, "_blank");
-  };
-
-  const handleCommentSubmit = async (e: React.FormEvent) => {
+  const onCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || !user) return;
-
-    setSubmittingComment(true);
-    try {
-      // Insert comment
-      const { data, error } = await supabase
-        .from("comments")
-        .insert({
-          content: newComment.trim(),
-          blog_id: blogId,
-          user_id: user.id,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Error posting comment:", error);
-        alert("Failed to post comment");
-        return;
-      }
-
-      // Get user profile for the new comment
-      const { data: userProfile } = await supabase
-        .from("profiles")
-        .select("full_name, avatar_url")
-        .eq("id", user.id)
-        .single();
-
-      // Add the new comment to local state
-      const newCommentObj: Comment = {
-        id: data.id,
-        content: newComment.trim(),
-        blog_id: blogId,
-        user_id: user.id,
-        created_at: data.created_at,
-        user_name:
-          userProfile?.full_name || user.email?.split("@")[0] || "User",
-        user_image: userProfile?.avatar_url || null,
-      };
-
-      setComments([newCommentObj, ...comments]);
-      setNewComment("");
-    } catch (err) {
-      console.error("Error:", err);
-      alert("Failed to post comment");
-    } finally {
-      setSubmittingComment(false);
-    }
+    await handleCommentSubmit(newComment, setNewComment, setSubmittingComment);
   };
 
-  if (loading) {
+  if (blogLoading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -463,7 +87,6 @@ export default function BlogDetail() {
 
       <article className="max-w-4xl mx-auto px-6 py-12">
         {isEditingBlog ? (
-          // Edit Blog Form
           <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Edit Blog</h2>
 
@@ -595,20 +218,13 @@ export default function BlogDetail() {
 
               <div className="flex justify-end gap-3">
                 <button
-                  onClick={() => {
-                    setIsEditingBlog(false);
-                    setEditTitle(blog.title);
-                    setEditContent(blog.content);
-                    setEditAuthorName(blog.author_name || "");
-                    setEditAuthorImage(null);
-                    setEditCoverImage(null);
-                  }}
+                  onClick={cancelEditing}
                   className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleUpdateBlog}
+                  onClick={() => handleUpdateBlog(user)}
                   disabled={savingBlog}
                   className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer"
                 >
@@ -618,7 +234,6 @@ export default function BlogDetail() {
             </div>
           </div>
         ) : (
-          // Normal Blog View
           <>
             {blog.cover_image_url && (
               <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
@@ -638,7 +253,7 @@ export default function BlogDetail() {
                 <div className="flex gap-2">
                   {/* Facebook Share Button */}
                   <button
-                    onClick={handleShareToFacebook}
+                    onClick={shareToFacebook}
                     className="bg-white border-2 border-blue-600 text-blue-600 p-2 rounded-lg transition-colors cursor-pointer hover:bg-blue-600 hover:text-white"
                     title="Share on Facebook"
                   >
@@ -662,7 +277,7 @@ export default function BlogDetail() {
                         </svg>
                       </button>
                       <button
-                        onClick={handleDeleteBlog}
+                        onClick={() => handleDeleteBlog(profile)}
                         disabled={deletingBlog}
                         className="bg-white border-2 border-red-500 text-red-500 p-2 rounded-lg transition-colors cursor-pointer hover:bg-red-500 hover:text-white disabled:border-red-300 disabled:text-red-300"
                         title="Delete blog"
@@ -729,7 +344,7 @@ export default function BlogDetail() {
           </h2>
 
           {user ? (
-            <form onSubmit={handleCommentSubmit} className="mb-8">
+            <form onSubmit={onCommentSubmit} className="mb-8">
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
@@ -809,7 +424,11 @@ export default function BlogDetail() {
                         (user && user.id === comment.user_id)) && (
                         <button
                           onClick={() =>
-                            handleDeleteComment(comment.id, comment.user_id)
+                            handleDeleteComment(
+                              comment.id,
+                              comment.user_id,
+                              profile
+                            )
                           }
                           className="bg-white border-2 border-red-500 text-red-500 p-1 rounded transition-colors cursor-pointer hover:bg-red-500 hover:text-white"
                           title={
@@ -845,7 +464,6 @@ export default function BlogDetail() {
           )}
         </div>
 
-        {/* Done Button - Added at the bottom */}
         <div className="mt-8 flex justify-end">
           <button
             onClick={() => router.push("/")}
