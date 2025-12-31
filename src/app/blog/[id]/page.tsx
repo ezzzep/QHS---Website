@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Share2 } from "lucide-react";
 import { getBrowserSupabase } from "@/lib/db";
-import Head from "next/head";
 
 const supabase = getBrowserSupabase();
 interface Blog {
@@ -55,65 +54,6 @@ export default function BlogDetail() {
   const [editCoverImage, setEditCoverImage] = useState<File | null>(null);
   const [savingBlog, setSavingBlog] = useState(false);
   const [deletingBlog, setDeletingBlog] = useState(false);
-
-  // Update document head when blog data is loaded
-  useEffect(() => {
-    if (blog) {
-      // Create a description from the blog content (first 150 characters)
-      const description =
-        blog.content.length > 150
-          ? blog.content.substring(0, 150) + "..."
-          : blog.content;
-
-      // Update page title
-      document.title = blog.title;
-
-      // Update or create meta tags
-      const updateMetaTag = (property: string, content: string) => {
-        let tag =
-          document.querySelector(`meta[property="${property}"]`) ||
-          document.querySelector(`meta[name="${property}"]`);
-
-        if (!tag) {
-          tag = document.createElement("meta");
-          tag.setAttribute(
-            property.includes(":") ? "property" : "name",
-            property
-          );
-          document.head.appendChild(tag);
-        }
-
-        tag.setAttribute("content", content);
-      };
-
-      // Update Open Graph tags
-      updateMetaTag("og:title", blog.title);
-      updateMetaTag("og:description", description);
-      updateMetaTag("og:type", "article");
-      updateMetaTag("og:url", window.location.href);
-      updateMetaTag("og:site_name", "Queen of Heaven School");
-
-      // Update image if available
-      if (blog.cover_image_url) {
-        updateMetaTag("og:image", blog.cover_image_url);
-        updateMetaTag("og:image:width", "1200");
-        updateMetaTag("og:image:height", "630");
-        updateMetaTag("og:image:alt", blog.title);
-      }
-
-      // Update Twitter Card tags
-      updateMetaTag("twitter:card", "summary_large_image");
-      updateMetaTag("twitter:title", blog.title);
-      updateMetaTag("twitter:description", description);
-
-      if (blog.cover_image_url) {
-        updateMetaTag("twitter:image", blog.cover_image_url);
-      }
-
-      // Update description meta tag
-      updateMetaTag("description", description);
-    }
-  }, [blog]);
 
   // Fetch current user
   useEffect(() => {
