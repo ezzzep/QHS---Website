@@ -456,7 +456,7 @@ export default function BlogDetail() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 pt-8 ">
+    <main className="min-h-screen bg-gray-50 pt-8 pb-12">
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4"></div>
       </div>
@@ -843,6 +843,16 @@ export default function BlogDetail() {
           ) : (
             <p className="text-gray-500 text-center py-8">No comments yet.</p>
           )}
+        </div>
+
+        {/* Done Button - Added at the bottom */}
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={() => router.push("/")}
+            className="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all shadow-md hover:shadow-lg hover:from-green-700 hover:to-green-800 cursor-pointer"
+          >
+            Done
+          </button>
         </div>
       </article>
     </main>
