@@ -119,11 +119,11 @@ export default function FacultyPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {faculty.map((item, index) => (
             <div
               key={item.id}
-              className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-200 shadow-md group ${
+              className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-200 shadow-md group flex flex-col ${
                 reorderMode && isAdmin ? "cursor-move" : "cursor-pointer"
               } ${dragOverItem?.id === item.id ? "ring-4 ring-green-400" : ""}`}
               draggable={reorderMode && isAdmin}
@@ -138,7 +138,7 @@ export default function FacultyPage() {
                 </div>
               )}
 
-              <div className="relative h-114 sm:h-115 lg:h-115 w-full">
+              <div className="relative aspect-[3/4] w-full flex-shrink-0">
                 {item.image_url ? (
                   <img
                     src={item.image_url}
@@ -153,16 +153,18 @@ export default function FacultyPage() {
                     className="object-cover"
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
+
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                  <p className="text-base sm:text-md text-white leading-relaxed">
+                    {item.name}
+                  </p>
+                </div>
               </div>
 
-              <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6">
-                <p className="text-base sm:text-lg text-white leading-relaxed">
-                  {item.name}
-                </p>
-
-                <div className="mt-4 sm:mt-6 border-t border-white/60 pt-3 sm:pt-4">
-                  <p className="text-white font-semibold text-sm sm:text-base">
+              <div className="bg-black p-4 sm:p-6 flex-grow">
+                <div className="border-t border-white/60 pt-3 sm:pt-4">
+                  <p className="text-green-300 font-semibold text-sm sm:text-sm tracking-wider whitespace-normal">
                     {item.position}
                   </p>
                 </div>

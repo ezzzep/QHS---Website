@@ -93,7 +93,7 @@ export default function FacultyModal({
                 <input
                   type="text"
                   placeholder="Enter full name"
-                  className="w-full rounded-lg border border-gray-300 px-3 sm:px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 cursor-pointer text-sm sm:text-base"
+                  className="w-full rounded-lg border border-gray-300 px-3 sm:px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 text-sm sm:text-base text-slate-800"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -106,7 +106,7 @@ export default function FacultyModal({
                 <input
                   type="text"
                   placeholder="Enter position or role"
-                  className="w-full rounded-lg border border-gray-300 px-3 sm:px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 cursor-pointer text-sm sm:text-base"
+                  className="w-full rounded-lg border border-gray-300 px-3 sm:px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20  text-sm sm:text-base text-slate-800"
                   value={position}
                   onChange={(e) => setPosition(e.target.value)}
                 />
@@ -119,7 +119,7 @@ export default function FacultyModal({
                 <input
                   type="file"
                   accept="image/*"
-                  className="w-full rounded-lg border border-gray-300 px-3 sm:px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 cursor-pointer text-sm sm:text-base"
+                  className="w-full rounded-lg border border-gray-300 px-3 sm:px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 cursor-pointer text-sm sm:text-base text-slate-800"
                   onChange={(e) => setImageFile(e.target.files?.[0] || null)}
                 />
                 {initialData && (
