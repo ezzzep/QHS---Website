@@ -87,7 +87,7 @@ export default function FacultyPage() {
                 onClick={() => setReorderMode(!reorderMode)}
                 className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 sm:px-6 sm:py-3 font-medium transition-colors cursor-pointer text-sm sm:text-base ${
                   reorderMode
-                    ? "bg-green-600 text-white hover:bg-green-700"
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
@@ -138,7 +138,7 @@ export default function FacultyPage() {
                 </div>
               )}
 
-              <div className="relative h-64 sm:h-80 lg:h-96 w-full">
+              <div className="relative h-114 sm:h-115 lg:h-115 w-full">
                 {item.image_url ? (
                   <img
                     src={item.image_url}
