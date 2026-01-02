@@ -108,7 +108,7 @@ export default function TuitionPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
@@ -119,7 +119,7 @@ export default function TuitionPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center max-w-md">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-800 mb-2">
@@ -138,7 +138,7 @@ export default function TuitionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="relative z-10">
         <div className="relative overflow-hidden bg-gradient-to-r from-green-600 to-green-700 text-white">
           <div className="absolute inset-0 bg-black opacity-5"></div>
