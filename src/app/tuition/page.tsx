@@ -143,25 +143,21 @@ export default function TuitionPage() {
         <div className="relative overflow-hidden bg-gradient-to-r from-green-600 to-green-700 text-white">
           <div className="absolute inset-0 bg-black opacity-5"></div>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-4 mb-4 pt-3">
-                  <h1 className="text-4xl sm:text-5xl font-bold">
-                    Tuition Fees
-                  </h1>
-                </div>
-                <SchoolYearEditor
-                  schoolYear={schoolYear}
-                  tempSchoolYear={tempSchoolYear}
-                  editingSchoolYear={editingSchoolYear}
-                  savingSchoolYear={savingSchoolYear}
-                  isAdmin={isAdmin}
-                  setTempSchoolYear={setTempSchoolYear}
-                  setEditingSchoolYear={setEditingSchoolYear}
-                  handleUpdateSchoolYear={handleUpdateSchoolYear}
-                  handleCancelEdit={handleCancelEdit}
-                />
+            <div className="flex flex-col items-center justify-center text-center">
+              <div className="flex flex-col items-center gap-4 mb-4 pt-3">
+                <h1 className="text-4xl sm:text-5xl font-bold">Tuition Fees</h1>
               </div>
+              <SchoolYearEditor
+                schoolYear={schoolYear}
+                tempSchoolYear={tempSchoolYear}
+                editingSchoolYear={editingSchoolYear}
+                savingSchoolYear={savingSchoolYear}
+                isAdmin={isAdmin}
+                setTempSchoolYear={setTempSchoolYear}
+                setEditingSchoolYear={setEditingSchoolYear}
+                handleUpdateSchoolYear={handleUpdateSchoolYear}
+                handleCancelEdit={handleCancelEdit}
+              />
             </div>
           </div>
           <div className="absolute bottom-0 left-0 right-0">
