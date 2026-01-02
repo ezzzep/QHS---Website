@@ -26,8 +26,10 @@ import {
   FileCheck,
   Image,
   AlertCircle,
+  ArrowRight,
 } from "lucide-react";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 // Type definitions
 interface TuitionFee {
@@ -35,6 +37,7 @@ interface TuitionFee {
   grade: string;
   fee_name: string;
   amount: number;
+  school_year: string;
   created_at: string;
   updated_at: string;
 }
@@ -108,11 +111,18 @@ const supabase: SupabaseClient = getBrowserSupabase();
 export default function TuitionPage() {
   const { user, profile, loading: authLoading } = useAuth();
   const isAdmin = user && profile?.role === "admin";
+  const router = useRouter();
 
   // State for tuition fees
   const [tuitionFees, setTuitionFees] = useState<GradeFees[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // State for school year
+  const [schoolYear, setSchoolYear] = useState<string>("2025-2026");
+  const [tempSchoolYear, setTempSchoolYear] = useState<string>("2025-2026");
+  const [editingSchoolYear, setEditingSchoolYear] = useState<boolean>(false);
+  const [savingSchoolYear, setSavingSchoolYear] = useState<boolean>(false);
 
   // Function to sort fees according to the predefined order
   const sortFees = (fees: FeeItem[]): FeeItem[] => {
@@ -214,6 +224,92 @@ export default function TuitionPage() {
     }
   };
 
+  // Fetch school year from database
+  const fetchSchoolYear = async (): Promise<void> => {
+    try {
+      // Get the most recent school year from tuition_fees
+      const { data, error } = await supabase
+        .from("tuition_fees")
+        .select("school_year")
+        .order("school_year", { ascending: false })
+        .limit(1);
+
+      if (error) {
+        // If there's an error, we'll use the default
+        console.log("Error fetching school year, using default");
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Ensure we have a valid string value
+        const yearValue = data[0].school_year;
+        if (yearValue && typeof yearValue === "string") {
+          setSchoolYear(yearValue);
+          setTempSchoolYear(yearValue);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching school year:", err);
+      // Don't set an error state that would crash the component
+      // Just continue with the default school year
+    }
+  };
+
+  // Update school year in database
+  const updateSchoolYear = async (): Promise<void> => {
+    try {
+      setSavingSchoolYear(true);
+
+      // Ensure we have a valid string value
+      if (tempSchoolYear && typeof tempSchoolYear === "string") {
+        // First, get all tuition fees to update
+        const { data: allFees, error: fetchError } = await supabase
+          .from("tuition_fees")
+          .select("id");
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        if (allFees && allFees.length > 0) {
+          // Update each tuition fee individually with the new school year
+          const updatePromises = allFees.map(async (fee) => {
+            const { error } = await supabase
+              .from("tuition_fees")
+              .update({ school_year: tempSchoolYear })
+              .eq("id", fee.id);
+
+            if (error) throw error;
+            return fee;
+          });
+
+          await Promise.all(updatePromises);
+        }
+
+        // Update the school year state
+        setSchoolYear(tempSchoolYear);
+        setEditingSchoolYear(false);
+
+        // Fetch the updated tuition fees
+        await fetchTuitionFees();
+      }
+    } catch (err) {
+      console.error("Error updating school year:", err);
+      setError("Failed to update school year. Please try again.");
+    } finally {
+      setSavingSchoolYear(false);
+    }
+  };
+
+  // Generate year options for dropdown
+  const generateYearOptions = (): string[] => {
+    const options = [];
+    for (let year = 2025; year <= 2050; year++) {
+      options.push(`${year}-${year + 1}`);
+    }
+    return options;
+  };
+
   // Helper function to get icon based on grade
   const getIconForGrade = (grade: string): React.ReactNode => {
     if (grade === "PRE - SCHOOL") return <Users className="w-8 h-8" />;
@@ -240,6 +336,11 @@ export default function TuitionPage() {
   };
 
   // Fetch data on component mount
+  useEffect(() => {
+    fetchSchoolYear();
+  }, []);
+
+  // Fetch tuition fees when school year changes
   useEffect(() => {
     fetchTuitionFees();
   }, []);
@@ -505,16 +606,98 @@ export default function TuitionPage() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
-                    <Calculator className="w-10 h-10" />
-                  </div>
                   <h1 className="text-4xl sm:text-5xl font-bold">
                     Tuition Fees
                   </h1>
                 </div>
-                <p className="text-xl text-green-100 max-w-2xl">
-                  Quality education investment for your child's bright future
-                </p>
+                <div className="flex items-center gap-4">
+                  <p className="text-xl text-green-100">For school year of</p>
+                  {isAdmin ? (
+                    <div className="flex items-center gap-2">
+                      {editingSchoolYear ? (
+                        <>
+                          <div className="relative">
+                            <select
+                              value={tempSchoolYear || "2025-2026"}
+                              onChange={(e) =>
+                                setTempSchoolYear(e.target.value)
+                              }
+                              disabled={savingSchoolYear}
+                              className="bg-white/20 backdrop-blur-sm text-white border border-white/30 rounded-lg px-8 py-1 focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none cursor-pointer"
+                            >
+                              {generateYearOptions().map((year) => (
+                                <option
+                                  key={year}
+                                  value={year}
+                                  className="text-gray-800"
+                                >
+                                  {year}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                              <svg
+                                className="w-4 h-4 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            </div>
+                            {savingSchoolYear && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-white/20 rounded-lg">
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={updateSchoolYear}
+                            disabled={savingSchoolYear}
+                            className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors shadow-lg cursor-pointer disabled:opacity-50"
+                            title="Save School Year"
+                          >
+                            <Save className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingSchoolYear(false);
+                              setTempSchoolYear(schoolYear);
+                            }}
+                            disabled={savingSchoolYear}
+                            className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg cursor-pointer disabled:opacity-50"
+                            title="Cancel"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xl text-green-100 font-semibold">
+                            {schoolYear || "2025-2026"}
+                          </span>
+                          <button
+                            onClick={() => setEditingSchoolYear(true)}
+                            className="p-2 bg-white/20 text-white rounded-full hover:bg-white/30 transition-all shadow-lg border border-white/30 cursor-pointer"
+                            title="Edit School Year"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-xl text-green-100 font-semibold">
+                      {schoolYear || "2025-2026"}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -830,43 +1013,48 @@ export default function TuitionPage() {
             </div>
           </div>
 
-          {/* Discounts Section */}
-          <div>
+          {/* Discounts Section - Updated with more subtle design */}
+          <div className="mb-16">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
                 Available Discounts
               </h2>
             </div>
 
-            <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-3xl p-8 text-white shadow-2xl">
-              <div className="text-center mb-6">
-                <p className="text-sm bg-white/20 backdrop-blur-sm inline-block px-4 py-2 rounded-full border border-white/30">
+            <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+              <div className="text-center mb-8">
+                <p className="text-sm text-gray-600 inline-block px-4 py-2 rounded-full bg-gray-50 border border-gray-200">
                   Only one discount applies per student (highest discount)
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                 {discounts.map((category: DiscountCategory, index: number) => (
                   <div
                     key={index}
-                    className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20"
+                    className="bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:shadow-md transition-shadow"
                   >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 bg-white/20 rounded-lg">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-3 bg-white rounded-xl shadow-sm text-green-600">
                         {category.icon}
                       </div>
-                      <h3 className="text-lg font-semibold">{category.type}</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {category.type}
+                      </h3>
                     </div>
 
                     <div className="space-y-3">
                       {category.items.map((item: DiscountItem, idx: number) => (
-                        <div key={idx} className="bg-white rounded-xl p-3">
+                        <div
+                          key={idx}
+                          className="bg-white rounded-xl p-4 shadow-sm"
+                        >
                           <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-gray-700">
                               {item.level}
                             </span>
                             <div className="flex flex-col items-end">
-                              <span className="px-3 py-1 rounded-full bg-green-600 text-white text-sm font-bold">
+                              <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-bold">
                                 {item.discount}
                               </span>
                               <span className="text-xs text-gray-500 mt-1">
@@ -879,6 +1067,20 @@ export default function TuitionPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Enroll Now Button */}
+              <div className="text-center">
+                <button
+                  onClick={() => router.push("/contact")}
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer"
+                >
+                  Enroll Now
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <p className="text-sm text-gray-600 mt-3">
+                  Your future starts here. Connect with us today!
+                </p>
               </div>
             </div>
           </div>
