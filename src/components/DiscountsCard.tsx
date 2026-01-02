@@ -11,8 +11,8 @@ export default function DiscountsCard({ discounts }: DiscountsCardProps) {
   return (
     <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
       <div className="text-center mb-8">
-        <p className="text-sm text-gray-600 inline-block px-4 py-2 rounded-full bg-gray-50 border border-gray-200">
-          Only one discount applies per student (highest discount)
+        <p className="text-sm text-white inline-block px-4 py-2 rounded-full bg-green-700 border border-gray-200 tracking-wide">
+          ONLY ONE DISCOUNT APPLIES PER STUDENT (HIGHEST DISCOUNT)
         </p>
       </div>
 
