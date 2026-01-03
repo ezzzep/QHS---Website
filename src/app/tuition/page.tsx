@@ -157,7 +157,7 @@ export default function TuitionPage() {
           </div>
           <div className="absolute bottom-0 left-0 right-0">
             <svg
-              className="w-full h-12 text-gray-50"
+              className="w-full h-8 sm:h-10 md:h-12 text-gray-50"
               preserveAspectRatio="none"
               viewBox="0 0 1440 54"
             >
@@ -169,8 +169,8 @@ export default function TuitionPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
             {tuitionFees.map((item) => (
               <FeeCard
                 key={item.id}
@@ -187,42 +187,42 @@ export default function TuitionPage() {
             ))}
           </div>
 
-          <div className="mb-16">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+          <div className="mb-12 sm:mb-16">
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                 Mode of Payment
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm sm:text-base">
                 Choose the payment option that works best for you
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {enhancedPaymentPlans.map((plan) => (
                 <PaymentPlanCard key={plan.id} plan={plan} />
               ))}
             </div>
 
-            <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-xl">
-              <p className="text-sm text-green-800 text-center">
+            <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-xl">
+              <p className="text-xs sm:text-sm text-green-800 text-center">
                 <strong>Important:</strong> Only one discount is applicable per
                 student. The higher discount will be applied.
               </p>
             </div>
           </div>
 
-          <div className="mb-16">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+          <div className="mb-12 sm:mb-16">
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                 Admission Requirements
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm sm:text-base">
                 Documents needed for enrollment at Queen of Heaven School of
                 Cavite, Inc.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
               {enhancedAdmissionRequirements.map((category) => (
                 <AdmissionRequirementsCard
                   key={category.id}
@@ -232,24 +232,24 @@ export default function TuitionPage() {
             </div>
           </div>
 
-          <div className="mb-16">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+          <div className="mb-12 sm:mb-16">
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                 Available Discounts
               </h2>
             </div>
 
             <DiscountsCard discounts={enhancedDiscounts} />
 
-            <div className="text-center pt-10">
+            <div className="text-center pt-8 sm:pt-10">
               <button
                 onClick={() => router.push("/contact")}
-                className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer"
+                className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer"
               >
                 Enroll Now
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-              <p className="text-sm text-gray-600 mt-3">
+              <p className="text-xs sm:text-sm text-gray-600 mt-2 sm:mt-3">
                 Your future starts here. Connect with us today!
               </p>
             </div>
