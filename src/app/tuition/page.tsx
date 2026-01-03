@@ -57,7 +57,6 @@ export default function TuitionPage() {
   const { getIconForGrade, getIconForFeeName, getIconForRequirement } =
     useIcons();
 
-  // Map payment types to icon components
   const getIconForPaymentType = (paymentType: string) => {
     switch (paymentType) {
       case "Full Payment":
@@ -69,7 +68,6 @@ export default function TuitionPage() {
     }
   };
 
-  // Map discount types to icon components
   const getIconForDiscountType = (type: string) => {
     switch (type) {
       case "Academic Excellence":
@@ -82,19 +80,16 @@ export default function TuitionPage() {
     }
   };
 
-  // Enhanced payment plans with proper icon components
   const enhancedPaymentPlans = PAYMENT_PLANS.map((plan) => ({
     ...plan,
     icon: getIconForPaymentType(plan.paymentType),
   }));
 
-  // Enhanced discounts with proper icon components
   const enhancedDiscounts = DISCOUNTS.map((discount) => ({
     ...discount,
     icon: getIconForDiscountType(discount.type),
   }));
 
-  // Enhanced admission requirements with proper icon components
   const enhancedAdmissionRequirements = ADMISSION_REQUIREMENTS.map(
     (category) => ({
       ...category,
@@ -145,7 +140,7 @@ export default function TuitionPage() {
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
             <div className="flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center gap-4 mb-4 pt-3">
-                <h1 className="text-4xl sm:text-5xl font-bold">Tuition Fees</h1>
+                <h1 className="text-3xl sm:text-5xl font-bold">Tuition Fees</h1>
               </div>
               <SchoolYearEditor
                 schoolYear={schoolYear}
