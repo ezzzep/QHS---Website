@@ -186,7 +186,9 @@ export default function ContactPage() {
                 <Mail className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Email Us</h3>
-              <p className="text-gray-600">queenofheavenschool@gmail.com</p>
+              <p className="text-sm sm:text-base text-gray-600 break-all">
+                queenofheavenschool@gmail.com
+              </p>
             </div>
           </div>
         </div>
