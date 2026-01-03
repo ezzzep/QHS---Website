@@ -63,8 +63,8 @@ export default function BlogDetail() {
   if (error || !blog) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">
+        <div className="text-center p-6 sm:p-8 bg-white rounded-lg shadow-lg max-w-md mx-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">
             Blog Not Found
           </h1>
           <p className="text-gray-600 mb-6">{error}</p>
@@ -80,15 +80,17 @@ export default function BlogDetail() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 pt-8 pb-12">
+    <main className="min-h-screen bg-gray-50 pt-6 sm:pt-8 pb-10 sm:pb-12">
       <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4"></div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 sm:py-4"></div>
       </div>
 
-      <article className="max-w-4xl mx-auto px-6 py-12">
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {isEditingBlog ? (
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Edit Blog</h2>
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+              Edit Blog
+            </h2>
 
             <div className="space-y-4">
               <div>
@@ -126,7 +128,7 @@ export default function BlogDetail() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-green-700 font-semibold mb-2">
                     Author Image
@@ -216,17 +218,17 @@ export default function BlogDetail() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col sm:flex-row justify-end gap-3">
                 <button
                   onClick={cancelEditing}
-                  className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleUpdateBlog(user)}
                   disabled={savingBlog}
-                  className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer"
+                  className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer order-1 sm:order-2"
                 >
                   {savingBlog ? "Saving..." : "Save Changes"}
                 </button>
@@ -236,18 +238,18 @@ export default function BlogDetail() {
         ) : (
           <>
             {blog.cover_image_url && (
-              <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+              <div className="mb-6 sm:mb-8 rounded-xl overflow-hidden shadow-lg">
                 <img
                   src={blog.cover_image_url}
                   alt={blog.title}
-                  className="w-full h-140 md:h-140 object-cover"
+                  className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover"
                 />
               </div>
             )}
 
-            <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-              <div className="flex justify-between items-start mb-4">
-                <h1 className="text-4xl md:text-4xl font-bold text-gray-900">
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-4">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
                   {blog.title}
                 </h1>
                 <div className="flex gap-2">
@@ -299,13 +301,13 @@ export default function BlogDetail() {
                   )}
                 </div>
               </div>
-              <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 pb-4 mb-6 gap-4">
                 <div className="flex items-center">
                   {blog.author_image_url && (
                     <img
                       src={blog.author_image_url}
                       alt="Author"
-                      className="w-24 h-24 rounded-full mr-3 object-cover"
+                      className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full mr-3 object-cover"
                     />
                   )}
                   <div>
@@ -323,11 +325,11 @@ export default function BlogDetail() {
                   </div>
                 </div>
               </div>
-              <div className="prose prose-lg max-w-none">
+              <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none">
                 {blog.content.split("\n").map((paragraph, index) => (
                   <p
                     key={index}
-                    className="mb-4 text-gray-700 leading-relaxed text-md tracking-wide"
+                    className="mb-4 text-gray-700 leading-relaxed text-sm sm:text-base tracking-wide"
                   >
                     {paragraph}
                   </p>
@@ -338,13 +340,13 @@ export default function BlogDetail() {
         )}
 
         {/* Comments Section */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
             Comments ({comments.length})
           </h2>
 
           {user ? (
-            <form onSubmit={onCommentSubmit} className="mb-8">
+            <form onSubmit={onCommentSubmit} className="mb-6 sm:mb-8">
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
@@ -372,7 +374,7 @@ export default function BlogDetail() {
               </div>
             </form>
           ) : (
-            <div className="mb-8 p-4 bg-gray-50 rounded-lg text-center">
+            <div className="mb-6 sm:mb-8 p-4 bg-gray-50 rounded-lg text-center">
               <p className="text-gray-600 mb-2">
                 You need to be logged in to post a comment.
               </p>
@@ -386,7 +388,7 @@ export default function BlogDetail() {
           )}
 
           {comments.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {comments.map((comment) => (
                 <div key={comment.id} className="flex items-start space-x-3">
                   <div className="flex-shrink-0">
@@ -402,13 +404,13 @@ export default function BlogDetail() {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 gap-1">
                       <div className="flex items-center">
-                        <h4 className="font-medium text-gray-900">
+                        <h4 className="font-medium text-gray-900 truncate">
                           {comment.user_name}
                         </h4>
-                        <span className="ml-2 text-sm text-gray-500">
+                        <span className="ml-2 text-sm text-gray-500 whitespace-nowrap">
                           {new Date(comment.created_at).toLocaleDateString(
                             "en-US",
                             {
@@ -452,7 +454,7 @@ export default function BlogDetail() {
                         </button>
                       )}
                     </div>
-                    <p className="text-gray-700 whitespace-pre-wrap">
+                    <p className="text-gray-700 whitespace-pre-wrap break-words">
                       {comment.content}
                     </p>
                   </div>
@@ -460,14 +462,16 @@ export default function BlogDetail() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">No comments yet.</p>
+            <p className="text-gray-500 text-center py-6 sm:py-8">
+              No comments yet.
+            </p>
           )}
         </div>
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-6 sm:mt-8 flex justify-end">
           <button
             onClick={() => router.push("/")}
-            className="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all shadow-md hover:shadow-lg hover:from-green-700 hover:to-green-800 cursor-pointer"
+            className="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold py-3 px-6 sm:px-8 rounded-lg transition-all shadow-md hover:shadow-lg hover:from-green-700 hover:to-green-800 cursor-pointer"
           >
             Done
           </button>
