@@ -3,29 +3,22 @@
 import emailjs from "@emailjs/browser";
 import Image from "next/image";
 import { useState, FormEvent, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
 import {
   Mail,
   Phone,
   MapPin,
   Clock,
   Send,
-  MessageSquare,
-  Users,
-  ChevronDown,
-  ChevronUp,
   CheckCircle,
   AlertCircle,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Youtube,
+  Lock,
+  Loader2,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
-// Type definitions
 interface FormData {
   name: string;
-  email: string;
   phone: string;
   subject: string;
   message: string;
@@ -38,52 +31,26 @@ interface FormErrors {
   message?: string;
 }
 
-interface FAQ {
-  question: string;
-  answer: string;
-}
-
 export default function ContactPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    email: "",
     phone: "",
     subject: "",
     message: "",
   });
   const [submitted, setSubmitted] = useState<boolean>(false);
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const faqs: FAQ[] = [
-    {
-      question: "What are your admission requirements?",
-      answer:
-        "Our admission requirements include completed application form, birth certificate, report cards, and parent's interview. We also require a simple assessment test for grade placement.",
-    },
-    {
-      question: "What are your school hours?",
-      answer:
-        "Classes run from 7:30 AM to 4:00 PM, Monday to Friday. After-school programs are available until 5:30 PM for enrolled students.",
-    },
-    {
-      question: "Do you offer transportation services?",
-      answer:
-        "Yes, we provide school bus services covering major areas in Cavite. Please contact our admin office for route availability and fees.",
-    },
-    {
-      question: "What extracurricular activities do you offer?",
-      answer:
-        "We offer various activities including sports, music, arts, STEM clubs, and language programs. These are included in our comprehensive curriculum.",
-    },
-  ];
 
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.email.trim()) {
+    if (!user?.email?.trim()) {
       newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(user.email)) {
       newErrors.email = "Email is invalid";
     }
     if (!formData.subject.trim()) newErrors.subject = "Subject is required";
@@ -93,10 +60,12 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const newErrors = validateForm();
     if (Object.keys(newErrors).length !== 0) {
       setErrors(newErrors);
+      setIsSubmitting(false);
       return;
     }
 
@@ -106,7 +75,7 @@ export default function ContactPage() {
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
         {
           name: formData.name,
-          email: formData.email,
+          email: user?.email || "",
           phone: formData.phone,
           subject: formData.subject,
           message: formData.message,
@@ -121,7 +90,6 @@ export default function ContactPage() {
         setSubmitted(false);
         setFormData({
           name: "",
-          email: "",
           phone: "",
           subject: "",
           message: "",
@@ -131,6 +99,8 @@ export default function ContactPage() {
     } catch (error) {
       console.error("EmailJS error:", error);
       alert("Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -144,9 +114,10 @@ export default function ContactPage() {
     }
   };
 
+  const isDisabled = loading || !user;
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Animated Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-br from-green-600 via-green-700 to-green-800 text-white">
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
@@ -178,7 +149,6 @@ export default function ContactPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-        {/* Contact Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           <div className="group relative bg-white rounded-2xl shadow-lg p-8 border border-green-200 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
             <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -221,13 +191,38 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Contact Form and Map */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Contact Form */}
           <div>
             <h2 className="text-3xl font-bold text-gray-800 mb-6">
               Send us a Message
             </h2>
+
+            {!loading && !user && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+                <div className="flex items-start">
+                  <Lock className="w-6 h-6 text-amber-600 mr-3 mt-1" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-amber-800">
+                      Login Required
+                    </h3>
+                    <p className="text-amber-700 text-sm mt-1">
+                      Please log in to send us a message. This helps us prevent
+                      spam and ensures that inquiries come from genuine parents
+                      or guardians.
+                    </p>
+                    <div className="flex gap-3 mt-4">
+                      <button
+                        onClick={() => router.push("/login")}
+                        className="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors duration-200 text-sm font-medium cursor-pointer"
+                      >
+                        Login
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {submitted ? (
               <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
                 <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
@@ -250,8 +245,13 @@ export default function ContactPage() {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
+                      disabled={isDisabled || isSubmitting}
                       className={`w-full px-4 py-3 rounded-lg border text-black placeholder:text-gray-300${
                         errors.name ? "border-red-500" : "border-gray-300"
+                      } ${
+                        isDisabled || isSubmitting
+                          ? "bg-gray-100 cursor-not-allowed"
+                          : ""
                       } focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200`}
                       placeholder="John Doe"
                     />
@@ -269,12 +269,13 @@ export default function ContactPage() {
                     <input
                       type="email"
                       name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
+                      value={user?.email || ""}
+                      onChange={() => {}}
+                      disabled={true}
                       className={`w-full px-4 py-3 rounded-lg border text-black placeholder:text-gray-300${
                         errors.email ? "border-red-500" : "border-gray-300"
-                      } focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200`}
-                      placeholder="john@example.com"
+                      } bg-gray-100 cursor-not-allowed focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200`}
+                      placeholder="your@email.com"
                     />
                     {errors.email && (
                       <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -293,7 +294,12 @@ export default function ContactPage() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-black placeholder:text-gray-300"
+                    disabled={isDisabled || isSubmitting}
+                    className={`w-full px-4 py-3 rounded-lg border border-gray-300 text-black placeholder:text-gray-300${
+                      isDisabled || isSubmitting
+                        ? "bg-gray-100 cursor-not-allowed"
+                        : ""
+                    } focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200`}
                     placeholder="+63 912 345 6789"
                   />
                 </div>
@@ -305,8 +311,13 @@ export default function ContactPage() {
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
+                    disabled={isDisabled || isSubmitting}
                     className={`w-full px-4 py-3 rounded-lg border text-black cursor-pointer ${
                       errors.subject ? "border-red-500" : "border-gray-300"
+                    } ${
+                      isDisabled || isSubmitting
+                        ? "bg-gray-100 cursor-not-allowed"
+                        : ""
                     } focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200`}
                   >
                     <option value="" disabled>
@@ -331,9 +342,14 @@ export default function ContactPage() {
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
+                    disabled={isDisabled || isSubmitting}
                     rows={5}
                     className={`w-full px-4 py-3 rounded-lg border text-black placeholder:text-gray-300 ${
                       errors.message ? "border-red-500" : "border-gray-300"
+                    } ${
+                      isDisabled || isSubmitting
+                        ? "bg-gray-100 cursor-not-allowed"
+                        : ""
                     } focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200`}
                     placeholder="Tell us more about your inquiry..."
                   ></textarea>
@@ -346,10 +362,24 @@ export default function ContactPage() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-green-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center group cursor-pointer"
+                  disabled={isDisabled || isSubmitting}
+                  className={`w-full font-medium py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center group ${
+                    isDisabled || isSubmitting
+                      ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                      : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                  }`}
                 >
-                  Send Message
-                  <Send className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200 text-white placeholder:text-gray-300" />
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send Message
+                      <Send className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                    </>
+                  )}
                 </button>
               </form>
             )}
