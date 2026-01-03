@@ -4,13 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
+import { User } from "lucide-react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { getBrowserSupabase } from "@/lib/db";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [open, setOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const pathname = usePathname();
@@ -29,9 +31,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
-  /* ======================
-     Auth state (CLIENT ONLY)
-  ====================== */
   useEffect(() => {
     const supabase = getBrowserSupabase();
 
@@ -68,92 +67,226 @@ export default function Navbar() {
   const isSolid = !isHome || scrolled;
 
   return (
-    <nav
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        isSolid ? "bg-white/90 shadow-sm backdrop-blur" : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/images/logo.png"
-            alt="School Logo"
-            width={60}
-            height={60}
-            priority
-          />
-        </Link>
+    <>
+      <nav
+        className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+          isSolid ? "bg-white/90 shadow-sm backdrop-blur" : "bg-transparent"
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <Link href="/" className="flex items-center gap-2 cursor-pointer">
+            <Image
+              src="/images/logo.png"
+              alt="School Logo"
+              width={60}
+              height={60}
+              priority
+              className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-[60px] lg:h-[60px]"
+              sizes="(max-width: 640px) 40px, (max-width: 768px) 48px, (max-width: 1024px) 56px, 60px"
+            />
+          </Link>
 
-        <div
-          className={`flex items-center gap-10 text-sm md:text-base font-medium ${
-            isSolid ? "text-slate-700" : "text-white"
-          }`}
-        >
-          <Link href="/" className="hover:text-green-600">
-            Home
-          </Link>
-          <Link href="/faculty" className="hover:text-green-600">
-            Admin & Faculty
-          </Link>
-          <Link href="/tuition" className="hover:text-green-600">
-            Tuition Fees
-          </Link>{" "}
-          <Link href="/about" className="hover:text-green-600">
-            About Us
-          </Link>
-          <Link href="/contact" className="hover:text-green-600">
-            Contact
-          </Link>
-          <Link href="/alumni" className="hover:text-green-600">
-            Alumni
-          </Link>
-          {user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setOpen(!open)}
-                className={`truncate max-w-[180px] ${
+          <div
+            className={`hidden lg:flex items-center gap-10 text-sm lg:text-base font-medium ${
+              isSolid ? "text-slate-700" : "text-white"
+            }`}
+          >
+            <Link href="/" className="hover:text-green-600 cursor-pointer">
+              Home
+            </Link>
+            <Link
+              href="/faculty"
+              className="hover:text-green-600 cursor-pointer"
+            >
+              Admin & Faculty
+            </Link>
+            <Link
+              href="/tuition"
+              className="hover:text-green-600 cursor-pointer"
+            >
+              Tuition Fees
+            </Link>
+            <Link href="/about" className="hover:text-green-600 cursor-pointer">
+              About Us
+            </Link>
+            <Link
+              href="/contact"
+              className="hover:text-green-600 cursor-pointer"
+            >
+              Contact
+            </Link>
+            <Link
+              href="/alumni"
+              className="hover:text-green-600 cursor-pointer"
+            >
+              Alumni
+            </Link>
+            {user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setOpen(!open)}
+                  className={`p-2 rounded-full transition-colors cursor-pointer ${
+                    isSolid
+                      ? "text-green-600 hover:bg-green-50"
+                      : "text-green-300 hover:bg-white/10"
+                  }`}
+                  title="Account"
+                >
+                  <User className="w-6 h-6" />
+                </button>
+
+                {open && (
+                  <div className="absolute right-0 mt-2 w-56 rounded-md border bg-white shadow-lg">
+                    <div className="px-4 py-3 border-b">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        Logged in user
+                      </p>
+                      <p className="text-sm text-gray-700 truncate mt-1">
+                        {user.email}
+                      </p>
+                    </div>
+                    <div className="py-1">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className={`${
                   isSolid
                     ? "text-green-600 hover:text-green-700"
                     : "text-green-300 hover:text-green-200"
-                }`}
-                title={user.email ?? ""}
+                } cursor-pointer`}
               >
-                {user.email}
-              </button>
+                Login
+              </Link>
+            )}
+          </div>
 
-              {open && (
-                <div className="absolute right-0 mt-2 w-40 rounded-md border bg-white shadow-lg">
-                  <Link
-                    href="/account"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setOpen(false)}
-                  >
-                    Account
-                  </Link>
+          <button
+            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 cursor-pointer"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span
+              className={`block transition-all duration-300 ease-out h-0.5 w-6 rounded-sm ${
+                isSolid ? "bg-slate-700" : "bg-white"
+              } ${
+                mobileMenuOpen ? "rotate-45 translate-y-1" : "-translate-y-0.5"
+              }`}
+            ></span>
+            <span
+              className={`block transition-all duration-300 ease-out h-0.5 w-6 rounded-sm my-0.5 ${
+                isSolid ? "bg-slate-700" : "bg-white"
+              } ${mobileMenuOpen ? "opacity-0" : "opacity-100"}`}
+            ></span>
+            <span
+              className={`block transition-all duration-300 ease-out h-0.5 w-6 rounded-sm ${
+                isSolid ? "bg-slate-700" : "bg-white"
+              } ${
+                mobileMenuOpen ? "-rotate-45 -translate-y-1" : "translate-y-0.5"
+              }`}
+            ></span>
+          </button>
+        </div>
+      </nav>
 
+      <div
+        className={`fixed inset-x-0 bottom-0 z-40 transform transition-transform duration-300 ease-in-out lg:hidden ${
+          mobileMenuOpen ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="bg-white shadow-lg rounded-t-2xl px-6 pt-4 pb-6">
+          <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+          <div className="flex flex-col gap-3 text-base font-medium text-slate-700">
+            <Link
+              href="/"
+              className="hover:text-green-600 py-1 cursor-pointer"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              href="/faculty"
+              className="hover:text-green-600 py-1 cursor-pointer"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Admin & Faculty
+            </Link>
+            <Link
+              href="/tuition"
+              className="hover:text-green-600 py-1 cursor-pointer"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Tuition Fees
+            </Link>
+            <Link
+              href="/about"
+              className="hover:text-green-600 py-1 cursor-pointer"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About Us
+            </Link>
+            <Link
+              href="/contact"
+              className="hover:text-green-600 py-1 cursor-pointer"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+            <Link
+              href="/alumni"
+              className="hover:text-green-600 py-1 cursor-pointer"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Alumni
+            </Link>
+            {user ? (
+              <>
+                <div className="border-t pt-3 mt-2">
+                  <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                    Logged in user
+                  </div>
+                  <div className="text-sm text-gray-600 truncate mb-3">
+                    {user.email}
+                  </div>
                   <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="text-left text-red-600 hover:bg-red-50 px-2 py-1 rounded w-full cursor-pointer"
                   >
                     Logout
                   </button>
                 </div>
-              )}
-            </div>
-          ) : (
-            <Link
-              href="/login"
-              className={`${
-                isSolid
-                  ? "text-green-600 hover:text-green-700"
-                  : "text-green-300 hover:text-green-200"
-              }`}
-            >
-              Login
-            </Link>
-          )}
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="text-green-600 hover:text-green-700 py-1 cursor-pointer"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
-    </nav>
+
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-30 lg:hidden cursor-pointer"
+          onClick={() => setMobileMenuOpen(false)}
+        ></div>
+      )}
+    </>
   );
 }
