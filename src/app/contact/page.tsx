@@ -1,5 +1,6 @@
 "use client";
 
+import emailjs from "@emailjs/browser";
 import Image from "next/image";
 import { useState, FormEvent, ChangeEvent } from "react";
 import {
@@ -99,13 +100,22 @@ export default function ContactPage() {
       return;
     }
 
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    try {
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
+        },
+        {
+          publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!,
+        }
+      );
 
-    if (res.ok) {
       setSubmitted(true);
       setTimeout(() => {
         setSubmitted(false);
@@ -116,15 +126,16 @@ export default function ContactPage() {
           subject: "",
           message: "",
         });
+        setErrors({});
       }, 3000);
-    } else {
+    } catch (error) {
+      console.error("EmailJS error:", error);
       alert("Failed to send message. Please try again.");
     }
   };
 
-
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -147,8 +158,8 @@ export default function ContactPage() {
               Get in Touch
             </h1>
             <p className="text-xl sm:text-2xl text-green-100 max-w-3xl mx-auto">
-              We&apos;re here to help and answer any questions you might have. We
-              look forward to hearing from you.
+              We&apos;re here to help and answer any questions you might have.
+              We look forward to hearing from you.
             </p>
           </div>
         </div>
@@ -290,16 +301,21 @@ export default function ContactPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Subject *
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-lg border text-black placeholder:text-gray-300 ${
+                    className={`w-full px-4 py-3 rounded-lg border text-black cursor-pointer ${
                       errors.subject ? "border-red-500" : "border-gray-300"
                     } focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200`}
-                    placeholder="How can we help you?"
-                  />
+                  >
+                    <option value="" disabled>
+                      Select a subject
+                    </option>
+                    <option value="FOR INQUIRY">For Inquiry</option>
+                    <option value="FOR ADMISSION">For Admission</option>
+                    <option value="WALK-IN SCHEDULE">Walk-In Schedule</option>
+                  </select>
                   {errors.subject && (
                     <p className="mt-1 text-sm text-red-600 flex items-center">
                       <AlertCircle className="w-4 h-4 mr-1" />
@@ -330,7 +346,7 @@ export default function ContactPage() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-green-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center group"
+                  className="w-full bg-green-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center group cursor-pointer"
                 >
                   Send Message
                   <Send className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200 text-white placeholder:text-gray-300" />
