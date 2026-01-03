@@ -97,7 +97,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2">
               <div
-                className={`relative h-[600px] overflow-hidden cursor-pointer group ${
+                className={`relative h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden cursor-pointer group ${
                   activeImage === 0 ? "ring-4 ring-green-600" : ""
                 }`}
               >
@@ -112,7 +112,7 @@ export default function AboutPage() {
 
             <div className="col-span-1">
               <div
-                className={`relative h-[290px] overflow-hidden cursor-pointer group ${
+                className={`relative h-[300px] sm:h-[290px] overflow-hidden cursor-pointer group ${
                   activeImage === 1 ? "ring-4 ring-green-600" : ""
                 }`}
               >
@@ -127,7 +127,7 @@ export default function AboutPage() {
 
             <div className="col-span-1">
               <div
-                className={`relative h-[290px] overflow-hidden cursor-pointer group ${
+                className={`relative h-[300px] sm:h-[290px] overflow-hidden cursor-pointer group ${
                   activeImage === 2 ? "ring-4 ring-green-600" : ""
                 }`}
               >
@@ -142,7 +142,7 @@ export default function AboutPage() {
 
             <div className="col-span-1 md:col-span-2 lg:col-span-2">
               <div
-                className={`relative h-[290px] overflow-hidden cursor-pointer group ${
+                className={`relative h-[300px] sm:h-[290px] overflow-hidden cursor-pointer group ${
                   activeImage === 3 ? "ring-4 ring-green-600" : ""
                 }`}
               >
@@ -157,27 +157,27 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <section className="max-w-6xl mx-auto px-40 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 items-stretch">
-            <div className="relative w-full flex items-center justify-center">
-              <div className="relative rounded-2xl overflow-hidden shadow-xl w-70 max-w-md">
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 lg:px-40 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 items-stretch gap-8 md:gap-0">
+            <div className="relative w-full flex items-center justify-center order-2 md:order-1 mt-8 md:mt-0">
+              <div className="relative rounded-2xl overflow-hidden shadow-xl w-70  max-w-md mx-auto">
                 <Image
                   src="/images/dra-mn.jpeg"
                   alt="Founder"
                   width={400}
                   height={500}
-                  className="object-cover w-70 h-73"
+                  className="object-cover w-full h-auto"
                 />
               </div>
             </div>
-            <div className="flex flex-col justify-center">
-              <h2 className="text-4xl font-bold text-gray-800 mb-6">
+            <div className="flex flex-col justify-center order-1 md:order-2">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-6">
                 Our Story
               </h2>
-              <span className="block text-6xl text-gray-300 leading-none">
+              <span className="block text-4xl sm:text-5xl md:text-6xl text-gray-300 leading-none">
                 “
               </span>
-              <p className="text-lg text-gray-700 mt-4">
+              <p className="text-base sm:text-lg text-gray-700 mt-4">
                 After teaching for many years in the Public school, my
                 dedication to teaching has grown stronger, which also gave me
                 enough courage and motivation to start my own school. In 2002,
@@ -185,12 +185,12 @@ export default function AboutPage() {
                 School was born.
               </p>
               <br />
-              <p className="text-lg text-gray-700 pb-12">
+              <p className="text-base sm:text-lg text-gray-700 pb-12">
                 From my father&apos;s old construction office, we transformed
                 the space into classrooms—a journey that allowed me not only to
                 do what I love but also to continue my mother&apos;s legacy.
               </p>
-              <span className="block text-6xl text-gray-300 leading-none text-right -mt-8">
+              <span className="block text-4xl sm:text-5xl md:text-6xl text-gray-300 leading-none text-right -mt-8">
                 ”
               </span>
               <div className="mt-2">
@@ -203,28 +203,28 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <div className="mb-22 mt-16">
+        <div className="mb-16 sm:mb-20 lg:mb-22 mt-16">
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-green-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-              <div className="p-8 md:p-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+              <div className="p-6 sm:p-8 md:p-12">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-6">
                   23 Years of Educational Excellence
                 </h2>
-                <p className="text-lg text-gray-600 mb-8">
+                <p className="text-base sm:text-lg text-gray-600 mb-8">
                   For more than two decades, Queen of Heaven School has been
                   shaping young minds and building futures. Our commitment to
                   quality education has made us a trusted institution in Cavite.
                 </p>
               </div>
-              <div className="relative bg-green-50 p-8 md:p-12 flex items-center justify-center">
+              <div className="relative bg-green-50 p-6 sm:p-8 md:p-12 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
-                    <Trophy className="w-10 h-10 text-green-600" />
+                  <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full mb-4">
+                    <Trophy className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
                     Excellence Award
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm sm:text-base">
                     Recognized for outstanding educational service
                   </p>
                 </div>
@@ -233,26 +233,26 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="mb-22">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+        <div className="mb-16 sm:mb-20 lg:mb-22">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               Academic Achievements
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
               Our commitment to excellence is reflected in our students&apos;
               outstanding performance
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl shadow-md p-6 border border-green-200 hover:shadow-xl transition-shadow duration-300">
-              <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4 mx-auto">
-                <Trophy className="w-8 h-8 text-green-600" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-green-200 hover:shadow-xl transition-shadow duration-300">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-4 mx-auto">
+                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 text-center">
                 NAT Overall First Place
               </h3>
-              <p className="text-gray-600 text-center mb-4">
+              <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">
                 Achieved the top position in the National Achievement Test
               </p>
               <div className="text-center">
@@ -262,14 +262,14 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 border border-green-200 hover:shadow-xl transition-shadow duration-300">
-              <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4 mx-auto">
-                <BookOpen className="w-8 h-8 text-green-600" />
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-green-200 hover:shadow-xl transition-shadow duration-300">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-4 mx-auto">
+                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 text-center">
                 DepED Compliance
               </h3>
-              <p className="text-gray-600 text-center mb-4">
+              <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">
                 Fully compliant with Department of Education standards
               </p>
               <div className="text-center">
@@ -279,14 +279,14 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 border border-green-200 hover:shadow-xl transition-shadow duration-300">
-              <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4 mx-auto">
-                <Target className="w-8 h-8 text-green-600" />
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-green-200 hover:shadow-xl transition-shadow duration-300">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-4 mx-auto">
+                <Target className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 text-center">
                 Outstanding Performance
               </h3>
-              <p className="text-gray-600 text-center mb-4">
+              <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">
                 Consistently producing high-achieving students
               </p>
               <div className="text-center">
@@ -298,15 +298,15 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-22">
-          <div className="bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-lg p-8 border border-green-200">
-            <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mb-4">
-              <Zap className="w-6 h-6 text-white" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-16 sm:mb-20 lg:mb-22">
+          <div className="bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-lg p-6 sm:p-8 border border-green-200">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-600 rounded-full flex items-center justify-center mb-4">
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
               Our Mission
             </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
               Queen of Heaven School is a child-friendly school, developing and
               providing God-fearing, value-laden, environment-friendly,
               productive individuals who will become responsible citizens of the
@@ -314,14 +314,14 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-lg p-8 border border-green-200">
-            <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mb-4">
-              <Eye className="w-6 h-6 text-white" />
+          <div className="bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-lg p-6 sm:p-8 border border-green-200">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-600 rounded-full flex items-center justify-center mb-4">
+              <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
               Our Vision
             </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
               To provide quality and relevant basic education for the
               learners&apos; complete intellectual, social, emotional, moral,
               spiritual knowledge and environmental awareness through competent
@@ -330,22 +330,22 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-8">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-8">
             Our Core Values
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {coreValues.map((value, index) => {
               const IconComponent = value.icon;
               return (
                 <div
                   key={index}
-                  className="bg-gradient-to-br from-white to-green-50 rounded-xl shadow-md p-8 border border-green-200 hover:shadow-xl transition-all duration-300"
+                  className="bg-gradient-to-br from-white to-green-50 rounded-xl shadow-md p-6 sm:p-8 border border-green-200 hover:shadow-xl transition-all duration-300"
                 >
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                    <IconComponent className="w-8 h-8 text-green-600" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-4">
+                    <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">
                     {value.name}
                   </h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
