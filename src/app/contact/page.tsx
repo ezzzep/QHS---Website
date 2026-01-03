@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Lock,
   Loader2,
+  Info,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -43,7 +44,6 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<FormErrors>({});
-
 
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};
@@ -266,17 +266,26 @@ export default function ContactPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address *
                     </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={user?.email || ""}
-                      onChange={() => {}}
-                      disabled={true}
-                      className={`w-full px-4 py-3 rounded-lg border text-black placeholder:text-gray-300${
-                        errors.email ? "border-red-500" : "border-gray-300"
-                      } bg-gray-100 cursor-not-allowed focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200`}
-                      placeholder="your@email.com"
-                    />
+                    <div className="relative">
+                      <input
+                        type="email"
+                        name="email"
+                        value={user?.email || ""}
+                        onChange={() => {}}
+                        disabled={true}
+                        title="This cannot be edited. Change logged in user account if you want to change the email."
+                        className={`w-full px-4 py-3 rounded-lg border text-black placeholder:text-gray-300${
+                          errors.email ? "border-red-500" : "border-gray-300"
+                        } bg-gray-100 cursor-not-allowed focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 pr-10`}
+                        placeholder="your@email.com"
+                      />
+                      <div
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+                        title="This cannot be edited. Change logged in user account if you want to change the email."
+                      >
+                        <Info className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </div>
                     {errors.email && (
                       <p className="mt-1 text-sm text-red-600 flex items-center">
                         <AlertCircle className="w-4 h-4 mr-1" />
