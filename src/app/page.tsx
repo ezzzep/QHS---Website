@@ -48,21 +48,21 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="relative z-10 text-center px-6 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <h1 className="animate-fade-in-down text-5xl md:text-7xl lg:text-8xl font-extrabold text-white">
+        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <h1 className="animate-fade-in-down text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold text-white">
             Queen of Heaven
           </h1>
-          <span className="block text-green-300 text-5xl md:text-7xl lg:text-7xl font-extrabold">
+          <span className="block text-green-300 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold">
             School of Cavite, INC.
           </span>
-          <p className="animate-fade-in-up mt-4 text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="animate-fade-in-up mt-4 text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 max-w-3xl mx-auto">
             Nurturing minds, building character, and inspiring excellence since
             2002.
           </p>
-          <div className="animate-fade-in-up mt-10">
+          <div className="animate-fade-in-up mt-6 sm:mt-8 md:mt-10">
             <a
               href="/contact"
-              className="inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-4 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg hover:shadow-xl cursor-pointer"
+              className="inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full text-base sm:text-lg transition-colors duration-300 shadow-lg hover:shadow-xl cursor-pointer"
             >
               Contact Us
             </a>
@@ -85,22 +85,21 @@ export default function Home() {
         )}
       </section>
 
-      {/* BLOG SECTION */}
-      <section id="features" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
-            <h2 className="text-4xl font-bold text-gray-800">
+      <section id="features" className="py-12 sm:py-16 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">
               Insightful Reads
             </h2>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center w-full lg:w-auto">
               <div className="relative w-full sm:w-auto">
                 <input
                   type="text"
                   placeholder="Search blogs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full sm:w-80 pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors text-gray-700 placeholder-gray-400"
+                  className="w-full sm:w-64 md:w-80 pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors text-gray-700 placeholder-gray-400"
                 />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +120,7 @@ export default function Home() {
               {profile?.role === "admin" && (
                 <button
                   onClick={() => setShowModal(true)}
-                  className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2.5 px-6 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg whitespace-nowrap cursor-pointer"
+                  className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2.5 px-4 sm:px-6 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg cursor-pointer text-sm sm:text-base"
                 >
                   + Add Blog
                 </button>
@@ -131,41 +130,41 @@ export default function Home() {
 
           {filteredBlogs.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">
+              <p className="text-gray-500 text-base sm:text-lg">
                 {searchQuery
                   ? "No blogs found matching your search."
                   : "No blogs available yet."}
               </p>
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {filteredBlogs.map((blog) => (
                 <div
                   key={blog.id}
                   onClick={() => handleBlogClick(blog.id)}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl min-h-[280px]"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
                 >
                   <div className="flex flex-col md:flex-row h-full">
                     {blog.cover_image_url && (
-                      <div className="md:w-1/3 h-64 md:h-auto min-h-[280px]">
+                      <div className="md:w-1/3 h-48 sm:h-56 md:h-auto min-h-[200px]">
                         <img
                           src={blog.cover_image_url}
                           className="h-full w-full object-cover"
                         />
                       </div>
                     )}
-                    <div className="p-8 md:w-2/3 flex flex-col justify-between h-full">
+                    <div className="p-4 sm:p-6 md:p-8 md:w-2/3 flex flex-col justify-between h-full">
                       <div>
-                        <div className="flex items-start justify-between mb-4">
-                          <h3 className="text-2xl font-semibold text-gray-800">
+                        <div className="flex items-start justify-between mb-3 sm:mb-4">
+                          <h3 className="text-xl sm:text-2xl font-semibold text-gray-800">
                             {blog.title}
                           </h3>
                         </div>
-                        <p className="text-gray-600 line-clamp-4 mb-4 text-base leading-relaxed">
+                        <p className="text-gray-600 line-clamp-3 sm:line-clamp-4 mb-4 text-sm sm:text-base leading-relaxed">
                           {blog.content}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between mt-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mt-4">
                         <div>
                           {blog.author_name && (
                             <p className="text-sm text-gray-600 mb-1">
@@ -183,11 +182,11 @@ export default function Home() {
                             )}
                           </p>
                         </div>
-                        <button className="text-green-600 hover:text-green-700 font-medium flex items-center cursor-pointer">
+                        <button className="text-green-600 hover:text-green-700 font-medium flex items-center cursor-pointer text-sm sm:text-base">
                           Read More
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 ml-1"
+                            className="h-4 w-4 sm:h-5 sm:w-5 ml-1"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                           >
@@ -208,22 +207,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-green-50 to-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-2xl transform transition-all flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-green-100">
-              <h3 className="text-2xl md:text-3xl font-bold text-green-800">
+          <div className="bg-gradient-to-br from-green-50 to-white rounded-2xl w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[90vh] shadow-2xl transform transition-all flex flex-col">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-green-100">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-green-800">
                 Add Blog
               </h3>
               <button
                 onClick={handleCancel}
-                className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+                className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer p-1"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
+                  className="h-5 w-5 sm:h-6 sm:w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -238,48 +235,47 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-green-700 font-semibold mb-2">
+                  <label className="block text-green-700 font-semibold mb-2 text-sm sm:text-base">
                     Title
                   </label>
                   <input
                     placeholder="Enter blog title"
-                    className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none"
+                    className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none text-sm sm:text-base"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-green-700 font-semibold mb-2">
+                  <label className="block text-green-700 font-semibold mb-2 text-sm sm:text-base">
                     Author Name
                   </label>
                   <input
                     placeholder="Enter author name"
-                    className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none"
+                    className="w-full border-2 border-green-200 focus:border-green-500 p-3 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none text-sm sm:text-base"
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-green-700 font-semibold mb-2">
+                  <label className="block text-green-700 font-semibold mb-2 text-sm sm:text-base">
                     Content
                   </label>
                   <textarea
                     placeholder="Write your blog content here. You can write multiple paragraphs..."
-                    className="w-full border-2 border-green-200 focus:border-green-500 p-4 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none resize-none min-h-[250px] md:min-h-[300px]"
+                    className="w-full border-2 border-green-200 focus:border-green-500 p-3 sm:p-4 rounded-lg text-gray-800 placeholder-gray-400 transition-colors outline-none resize-none min-h-[200px] sm:min-h-[250px] md:min-h-[300px] text-sm sm:text-base"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="block text-green-700 font-semibold mb-2">
+                    <label className="block text-green-700 font-semibold mb-2 text-sm sm:text-base">
                       Author Image
                     </label>
                     <div className="relative">
@@ -298,7 +294,7 @@ export default function Home() {
                         <div className="text-center">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-8 w-8 mx-auto text-green-500 mb-1"
+                            className="h-6 w-6 sm:h-8 sm:w-8 mx-auto text-green-500 mb-1"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -310,7 +306,7 @@ export default function Home() {
                               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                             />
                           </svg>
-                          <p className="text-green-700 text-sm font-medium truncate">
+                          <p className="text-green-700 text-xs sm:text-sm font-medium truncate">
                             {authorImage
                               ? authorImage.name
                               : "Choose author image"}
@@ -321,7 +317,7 @@ export default function Home() {
                   </div>
 
                   <div>
-                    <label className="block text-green-700 font-semibold mb-2">
+                    <label className="block text-green-700 font-semibold mb-2 text-sm sm:text-base">
                       Cover Image
                     </label>
                     <div className="relative">
@@ -340,7 +336,7 @@ export default function Home() {
                         <div className="text-center">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-8 w-8 mx-auto text-green-500 mb-1"
+                            className="h-6 w-6 sm:h-8 sm:w-8 mx-auto text-green-500 mb-1"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -352,7 +348,7 @@ export default function Home() {
                               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                             />
                           </svg>
-                          <p className="text-green-700 text-sm font-medium truncate">
+                          <p className="text-green-700 text-xs sm:text-sm font-medium truncate">
                             {coverImage
                               ? coverImage.name
                               : "Choose cover image"}
@@ -365,18 +361,17 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="flex justify-end gap-3 p-6 border-t border-green-100 bg-green-50/50">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 p-4 sm:p-6 border-t border-green-100 bg-green-50/50">
               <button
                 onClick={handleCancel}
-                className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer"
+                className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer text-sm sm:text-base order-2 sm:order-1"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveBlog}
                 disabled={isSaving}
-                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg cursor-pointer disabled:opacity-50"
+                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg cursor-pointer disabled:opacity-50 text-sm sm:text-base order-1 sm:order-2"
               >
                 {isSaving ? "Saving..." : "Save Blog"}
               </button>
