@@ -32,24 +32,8 @@ export default function AlumniPage() {
     refreshAlumni();
   }, [refreshAlumni]);
 
-  // Sort alumni by ID (descending) to ensure new items appear at the end
-  // Handle both numeric and string IDs
   const sortedAlumni = [...alumni].sort((a, b) => {
-    // If IDs are numbers, compare them directly (reversed for descending order)
-    if (typeof a.id === "number" && typeof b.id === "number") {
-      return b.id - a.id; // Changed from a.id - b.id to b.id - a.id
-    }
-    // If IDs are strings, compare them as strings
-    // or convert to numbers if they represent numeric values
-    const idA = typeof a.id === "string" ? parseInt(a.id, 10) || a.id : a.id;
-    const idB = typeof b.id === "string" ? parseInt(b.id, 10) || b.id : b.id;
-
-    if (typeof idA === "number" && typeof idB === "number") {
-      return idB - idA; // Changed from idA - idB to idB - idA
-    }
-
-    // Fallback to string comparison (reversed for descending order)
-    return String(idB).localeCompare(String(idA)); // Changed from String(idA).localeCompare(String(idB))
+    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
   });
 
   if (authLoading) {
