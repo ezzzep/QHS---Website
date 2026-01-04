@@ -32,12 +32,12 @@ export default function AlumniPage() {
     refreshAlumni();
   }, [refreshAlumni]);
 
-  // Sort alumni by ID (ascending) to ensure new items appear at the end
+  // Sort alumni by ID (descending) to ensure new items appear at the end
   // Handle both numeric and string IDs
   const sortedAlumni = [...alumni].sort((a, b) => {
-    // If IDs are numbers, compare them directly
+    // If IDs are numbers, compare them directly (reversed for descending order)
     if (typeof a.id === "number" && typeof b.id === "number") {
-      return a.id - b.id;
+      return b.id - a.id; // Changed from a.id - b.id to b.id - a.id
     }
     // If IDs are strings, compare them as strings
     // or convert to numbers if they represent numeric values
@@ -45,11 +45,11 @@ export default function AlumniPage() {
     const idB = typeof b.id === "string" ? parseInt(b.id, 10) || b.id : b.id;
 
     if (typeof idA === "number" && typeof idB === "number") {
-      return idA - idB;
+      return idB - idA; // Changed from idA - idB to idB - idA
     }
 
-    // Fallback to string comparison
-    return String(idA).localeCompare(String(idB));
+    // Fallback to string comparison (reversed for descending order)
+    return String(idB).localeCompare(String(idA)); // Changed from String(idA).localeCompare(String(idB))
   });
 
   if (authLoading) {
@@ -152,7 +152,7 @@ export default function AlumniPage() {
                         className="object-cover"
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
 
                     <div className="absolute bottom-0 left-4 p-1">
                       <p className="text-base sm:text-md text-white leading-relaxed font-medium">
