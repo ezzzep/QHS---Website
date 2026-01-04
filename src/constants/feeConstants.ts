@@ -91,7 +91,7 @@ export const ADMISSION_REQUIREMENTS = [
         name: "Long Brown Envelope with Plastic Envelope",
       },
       {
-        name: "2pcs each of 1x1 and 2x2 ID Picture",
+        name: "Two (2) copies each of 1x1 and 2x2 ID Photo",
       },
     ],
   },
@@ -116,7 +116,7 @@ export const ADMISSION_REQUIREMENTS = [
         name: "Long Brown Envelope with Plastic Envelope",
       },
       {
-        name: "2pcs each of 1x1 and 2x2 ID Picture",
+        name: "Two (2) copies each of 1x1 and 2x2 ID Photo",
       },
     ],
   },
