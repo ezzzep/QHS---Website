@@ -205,7 +205,10 @@ export default function AlumniModal({
           {/* Header */}
           <div className="bg-green-600 px-6 py-4 flex justify-between items-center">
             <h2 className="text-white text-xl font-semibold">{title}</h2>
-            <button onClick={handleClose} className="text-white text-lg">
+            <button
+              onClick={handleClose}
+              className="text-white text-lg cursor-pointer"
+            >
               ✕
             </button>
           </div>
@@ -273,9 +276,9 @@ export default function AlumniModal({
                           e.stopPropagation();
                           handleRemoveAchievement(index);
                         }}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
                       >
-                        ×
+                        x
                       </button>
                     </div>
                   ))}
@@ -295,13 +298,13 @@ export default function AlumniModal({
                   placeholder={
                     editingIndex !== null
                       ? "Edit achievement"
-                      : "Add an achievement"
+                      : "Click add to save achievement"
                   }
                 />
                 <button
                   type="button"
                   onClick={handleAddAchievement}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                  className="bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
                 >
                   {editingIndex !== null ? "Update" : "Add"}
                 </button>
@@ -329,7 +332,7 @@ export default function AlumniModal({
                       setImagePreview(null);
                       setImageFile(null);
                     }}
-                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded"
+                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
                   >
                     Remove
                   </button>

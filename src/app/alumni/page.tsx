@@ -53,11 +53,11 @@ export default function AlumniPage() {
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight pt-4">
-              Our Alumni
+            <h1 className="text-2xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight pt-4 text-green-100">
+              Celebrating 23 Years of
             </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-xl text-green-100">
-              Proud graduates making a difference in the world
+            <p className="mt-4 max-w-2xl mx-auto text-3xl sm:text-4xl lg:text-5xl font-extrabold ">
+              Academic Excellence
             </p>
           </div>
           <div className="absolute bottom-0 left-0 right-0">
@@ -78,9 +78,12 @@ export default function AlumniPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
         <div className="mb-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
-              Alumni Directory
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-4">
+              QHS Alumni Achievers
             </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-3xl sm:text-3xl  font-light text-green-800 italic">
+              We are Proud of You!
+            </p>
             <div className="w-24 h-1 bg-green-600 mx-auto mt-4"></div>
           </div>
 
@@ -153,7 +156,7 @@ export default function AlumniPage() {
                           {achievements.map((achievement, index) => (
                             <div key={index} className="flex items-start">
                               <span className="text-green-300 font-bold text-sm "></span>
-                              <p className="text-green-300 font-semibold text-xs sm:text-xs tracking-widerwhitespace-normal">
+                              <p className="text-green-300 font-semibold text-xs sm:text-xs tracking-widest Whitespace-normal">
                                 {achievement}
                               </p>
                             </div>
