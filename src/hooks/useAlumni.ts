@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { getBrowserSupabase } from "@/lib/db";
 
-// Define the Alumni type
 export interface Alumni {
   id: string;
   name: string;
@@ -25,9 +24,9 @@ export const useAlumni = () => {
 
     const loadAlumni = async () => {
       const { data } = await supabase
-        .from("almuni") // Using "almuni" as in your table name
+        .from("alumni") 
         .select("*")
-        .order("created_at", { ascending: false }); // Order by creation date, newest first
+        .order("created_at", { ascending: false });
 
       if (mounted && data) setAlumni(data);
     };
@@ -40,7 +39,7 @@ export const useAlumni = () => {
 
   const refreshAlumni = async () => {
     const { data } = await supabase
-      .from("almuni") // Using "almuni" as in your table name
+      .from("alumni")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -84,7 +83,7 @@ export const useAlumni = () => {
         imageUrl = await uploadImage(imageFile);
       }
 
-      const { error } = await supabase.from("almuni").insert({
+      const { error } = await supabase.from("alumni").insert({
         name,
         description,
         image_url: imageUrl,
@@ -125,7 +124,7 @@ export const useAlumni = () => {
       }
 
       const { error } = await supabase
-        .from("almuni")
+        .from("alumni")
         .update({
           name,
           description,
@@ -159,19 +158,16 @@ export const useAlumni = () => {
     }
 
     try {
-      // Get the image URL before deleting the record
       const { data: alumniMember } = await supabase
-        .from("almuni")
+        .from("alumni")
         .select("image_url")
         .eq("id", id)
         .single();
 
-      // Delete the record
-      const { error } = await supabase.from("almuni").delete().eq("id", id);
+      const { error } = await supabase.from("alumni").delete().eq("id", id);
 
       if (error) throw error;
-
-      // Delete the image from storage if it exists
+      
       if (alumniMember?.image_url) {
         const urlParts = alumniMember.image_url.split("/");
         const filePath = urlParts[urlParts.length - 1];

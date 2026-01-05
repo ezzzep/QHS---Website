@@ -27,7 +27,6 @@ export default function AlumniPage() {
 
   const isAdmin = user && profile?.role === "admin";
 
-  // Fetch alumni data when component mounts
   useEffect(() => {
     refreshAlumni();
   }, [refreshAlumni]);
@@ -113,7 +112,6 @@ export default function AlumniPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 items-stretch">
             {sortedAlumni.map((item) => {
-              // Parse achievements from description
               const achievements = item.description
                 .split(",")
                 .map((a) => a.trim())
@@ -150,13 +148,12 @@ export default function AlumniPage() {
 
                   <div className="bg-black p-4 sm:p-6 flex-grow flex flex-col">
                     <div className="border-t border-white/60 pt-3 sm:pt-4 flex-grow">
-                      {/* Achievement Text */}
                       {achievements.length > 0 ? (
                         <div className="space-y-2">
                           {achievements.map((achievement, index) => (
                             <div key={index} className="flex items-start">
                               <span className="text-green-300 font-bold text-sm "></span>
-                              <p className="text-green-300 font-semibold text-xs sm:text-xs tracking-widest Whitespace-normal">
+                              <p className="text-green-300 font-semibold text-sm sm:text-sm tracking-wide Whitespace-normal">
                                 {achievement}
                               </p>
                             </div>

@@ -35,19 +35,12 @@ export default function AlumniModal({
   const [hoveredChip, setHoveredChip] = useState<number | null>(null);
   const achievementInputRef = useRef<HTMLInputElement>(null);
 
-  /* =============================
-     FIX: Populate form on EDIT
-  ============================== */
   useEffect(() => {
     if (isOpen && initialData) {
       setName(initialData.name);
 
-      // Check if description is in achievement format (comma-separated)
-      // This will work even with a single achievement
       const desc = initialData.description.trim();
 
-      // Check if it looks like achievements (has commas or is a short phrase)
-      // This is a heuristic - you might need to adjust based on your data
       if (desc.includes(",") || desc.split(" ").length <= 5) {
         const parsedAchievements = desc
           .split(",")
@@ -55,7 +48,7 @@ export default function AlumniModal({
           .filter((a) => a);
         if (parsedAchievements.length > 0) {
           setAchievements(parsedAchievements);
-          setDescription(""); // Clear the description field since we're using achievements
+          setDescription(""); 
         } else {
           setAchievements([]);
           setDescription(desc);
@@ -82,9 +75,6 @@ export default function AlumniModal({
 
   if (!isOpen) return null;
 
-  /* =============================
-     Image handler
-  ============================== */
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       const file = e.target.files[0];
@@ -98,19 +88,14 @@ export default function AlumniModal({
     }
   };
 
-  /* =============================
-     Achievement handlers
-  ============================== */
   const handleAddAchievement = () => {
     if (currentAchievement.trim()) {
       if (editingIndex !== null) {
-        // Update existing achievement
         const updatedAchievements = [...achievements];
         updatedAchievements[editingIndex] = currentAchievement.trim();
         setAchievements(updatedAchievements);
         setEditingIndex(null);
       } else {
-        // Add new achievement
         setAchievements([...achievements, currentAchievement.trim()]);
       }
       setCurrentAchievement("");
@@ -119,24 +104,18 @@ export default function AlumniModal({
 
   const handleRemoveAchievement = (index: number) => {
     setAchievements(achievements.filter((_, i) => i !== index));
-    // If we're editing this achievement, reset the editing state
     if (editingIndex === index) {
       setEditingIndex(null);
       setCurrentAchievement("");
     }
-    // If we're editing an achievement that comes after the removed one,
-    // adjust the editing index
     else if (editingIndex !== null && editingIndex > index) {
       setEditingIndex(editingIndex - 1);
     }
   };
 
   const handleEditAchievement = (index: number) => {
-    // Set the current achievement to the text of the clicked chip
     setCurrentAchievement(achievements[index]);
-    // Mark this achievement as being edited
     setEditingIndex(index);
-    // Focus on the input field
     setTimeout(() => {
       achievementInputRef.current?.focus();
     }, 0);
@@ -151,15 +130,9 @@ export default function AlumniModal({
     }
   };
 
-  /* =============================
-     Validation
-  ============================== */
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-
     if (!name.trim()) newErrors.name = "Name is required";
-
-    // Either description or achievements should be provided
     if (!description.trim() && achievements.length === 0) {
       newErrors.description =
         "Description or at least one achievement is required";
@@ -179,18 +152,12 @@ export default function AlumniModal({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
-    // Convert achievements array to comma-separated string for submission
     const finalDescription =
       achievements.length > 0 ? achievements.join(", ") : description;
-
     const success = await onSubmit(name, finalDescription, imageFile);
     if (success) handleClose();
   };
 
-  /* =============================
-     Close
-  ============================== */
   const handleClose = () => {
     setErrors({});
     onClose();
@@ -202,7 +169,6 @@ export default function AlumniModal({
 
       <div className="relative w-full max-w-lg">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          {/* Header */}
           <div className="bg-green-600 px-6 py-4 flex justify-between items-center">
             <h2 className="text-white text-xl font-semibold">{title}</h2>
             <button
@@ -213,9 +179,7 @@ export default function AlumniModal({
             </button>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            {/* Name */}
             <div>
               <label className="text-sm font-medium text-black">
                 Full Name
@@ -232,13 +196,11 @@ export default function AlumniModal({
               )}
             </div>
 
-            {/* Achievements */}
             <div>
               <label className="text-sm font-medium text-black">
                 Achievements
               </label>
 
-              {/* Achievement Chips */}
               {achievements.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-3">
                   {achievements.map((achievement, index) => (
@@ -261,7 +223,6 @@ export default function AlumniModal({
                         {index + 1}
                       </div>
 
-                      {/* Tooltip */}
                       {hoveredChip === index && (
                         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap">
                           {achievement}
@@ -269,7 +230,6 @@ export default function AlumniModal({
                         </div>
                       )}
 
-                      {/* Remove button */}
                       <button
                         type="button"
                         onClick={(e) => {
@@ -285,7 +245,6 @@ export default function AlumniModal({
                 </div>
               )}
 
-              {/* Add Achievement Input */}
               <div className="flex gap-2">
                 <input
                   ref={achievementInputRef}
@@ -314,7 +273,6 @@ export default function AlumniModal({
               )}
             </div>
 
-            {/* Image */}
             <div>
               <label className="text-sm font-medium text-black">
                 Profile Image {!initialData && "*"}
@@ -360,7 +318,6 @@ export default function AlumniModal({
               )}
             </div>
 
-            {/* Actions */}
             <div className="flex justify-end gap-3 pt-4">
               <button
                 type="button"
