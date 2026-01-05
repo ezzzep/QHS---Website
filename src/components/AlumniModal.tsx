@@ -48,7 +48,7 @@ export default function AlumniModal({
           .filter((a) => a);
         if (parsedAchievements.length > 0) {
           setAchievements(parsedAchievements);
-          setDescription(""); 
+          setDescription("");
         } else {
           setAchievements([]);
           setDescription(desc);
@@ -107,8 +107,7 @@ export default function AlumniModal({
     if (editingIndex === index) {
       setEditingIndex(null);
       setCurrentAchievement("");
-    }
-    else if (editingIndex !== null && editingIndex > index) {
+    } else if (editingIndex !== null && editingIndex > index) {
       setEditingIndex(editingIndex - 1);
     }
   };
@@ -164,49 +163,56 @@ export default function AlumniModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       <div className="absolute inset-0 bg-black/60" onClick={handleClose} />
 
-      <div className="relative w-full max-w-lg">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div className="bg-green-600 px-6 py-4 flex justify-between items-center">
-            <h2 className="text-white text-xl font-semibold">{title}</h2>
+      <div className="relative w-full max-w-lg mx-auto">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-green-600 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+            <h2 className="text-white text-lg sm:text-xl font-semibold">
+              {title}
+            </h2>
             <button
               onClick={handleClose}
-              className="text-white text-lg cursor-pointer"
+              className="text-white text-lg sm:text-xl cursor-pointer"
             >
               ✕
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="p-4 sm:p-6 space-y-4 sm:space-y-6"
+          >
             <div>
-              <label className="text-sm font-medium text-black">
+              <label className="text-sm sm:text-base font-medium text-black">
                 Full Name
               </label>
               <input
-                className={`w-full border rounded-lg px-4 py-2 text-gray-800 ${
+                className={`w-full border rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-gray-800 text-sm sm:text-base ${
                   errors.name ? "border-red-500" : "border-gray-300"
                 }`}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
               {errors.name && (
-                <p className="text-sm text-red-600">{errors.name}</p>
+                <p className="text-xs sm:text-sm text-red-600 mt-1">
+                  {errors.name}
+                </p>
               )}
             </div>
 
             <div>
-              <label className="text-sm font-medium text-black">
+              <label className="text-sm sm:text-base font-medium text-black">
                 Achievements
               </label>
 
               {achievements.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
                   {achievements.map((achievement, index) => (
                     <div key={index} className="relative">
                       <div
-                        className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-colors ${
+                        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium cursor-pointer transition-colors ${
                           editingIndex === index
                             ? "bg-blue-500 text-white"
                             : "bg-green-100 text-green-800 hover:bg-green-200"
@@ -224,7 +230,7 @@ export default function AlumniModal({
                       </div>
 
                       {hoveredChip === index && (
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap">
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 sm:px-3 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
                           {achievement}
                           <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
                         </div>
@@ -236,7 +242,7 @@ export default function AlumniModal({
                           e.stopPropagation();
                           handleRemoveAchievement(index);
                         }}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
+                        className="absolute -top-1 sm:-top-1.5 -right-1 sm:-right-1.5 bg-red-500 text-white rounded-full w-3 h-3 sm:w-4 sm:h-4 flex items-center justify-center text-xs cursor-pointer"
                       >
                         x
                       </button>
@@ -245,10 +251,10 @@ export default function AlumniModal({
                 </div>
               )}
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 sm:gap-3">
                 <input
                   ref={achievementInputRef}
-                  className={`flex-1 border rounded-lg px-4 py-2 text-gray-800 ${
+                  className={`flex-1 border rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-gray-800 text-sm sm:text-base ${
                     errors.description ? "border-red-500" : "border-gray-300"
                   } ${editingIndex !== null ? "ring-2 ring-blue-500" : ""}`}
                   value={currentAchievement}
@@ -263,23 +269,25 @@ export default function AlumniModal({
                 <button
                   type="button"
                   onClick={handleAddAchievement}
-                  className="bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                  className="bg-blue-800 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer text-sm sm:text-base"
                 >
                   {editingIndex !== null ? "Update" : "Add"}
                 </button>
               </div>
               {errors.description && (
-                <p className="text-sm text-red-600">{errors.description}</p>
+                <p className="text-xs sm:text-sm text-red-600 mt-1">
+                  {errors.description}
+                </p>
               )}
             </div>
 
             <div>
-              <label className="text-sm font-medium text-black">
+              <label className="text-sm sm:text-base font-medium text-black">
                 Profile Image {!initialData && "*"}
               </label>
 
               {imagePreview ? (
-                <div className="relative h-48">
+                <div className="relative h-32 sm:h-48">
                   <img
                     src={imagePreview}
                     className="w-full h-full object-cover rounded-lg"
@@ -290,20 +298,22 @@ export default function AlumniModal({
                       setImagePreview(null);
                       setImageFile(null);
                     }}
-                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
+                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded cursor-pointer text-xs sm:text-sm"
                   >
                     Remove
                   </button>
                 </div>
               ) : (
-                <label className="block border-2 border-dashed rounded-lg p-6 text-center cursor-pointer">
+                <label className="block border-2 border-dashed rounded-lg p-4 sm:p-6 text-center cursor-pointer">
                   <input
                     type="file"
                     className="hidden"
                     accept="image/*"
                     onChange={handleImageChange}
                   />
-                  <span className="text-gray-600">Click to upload image</span>
+                  <span className="text-gray-600 text-sm sm:text-base">
+                    Click to upload image
+                  </span>
                 </label>
               )}
 
@@ -314,22 +324,24 @@ export default function AlumniModal({
               )}
 
               {errors.image && (
-                <p className="text-sm text-red-600">{errors.image}</p>
+                <p className="text-xs sm:text-sm text-red-600 mt-1">
+                  {errors.image}
+                </p>
               )}
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-2 sm:gap-3 pt-2 sm:pt-4">
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2 border rounded-lg text-black cursor-pointer"
+                className="px-3 sm:px-4 py-2 sm:py-3 border rounded-lg text-black cursor-pointer text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-60 cursor-pointer"
+                className="px-3 sm:px-4 py-2 sm:py-3 bg-green-600 text-white rounded-lg disabled:opacity-60 cursor-pointer text-sm sm:text-base"
               >
                 {loading ? "Processing..." : submitText}
               </button>
