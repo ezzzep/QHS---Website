@@ -11,6 +11,7 @@ import { getBrowserSupabase } from "@/lib/db";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<{ role: string } | null>(null);
   const [open, setOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -49,6 +50,36 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setProfile(null);
+      return;
+    }
+
+    const fetchProfile = async () => {
+      try {
+        const supabase = getBrowserSupabase();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching profile:", error);
+          return;
+        }
+
+        setProfile(data);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
+
+  useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (!dropdownRef.current?.contains(e.target as Node)) {
         setOpen(false);
@@ -63,6 +94,8 @@ export default function Navbar() {
     const supabase = getBrowserSupabase();
     await supabase.auth.signOut();
   };
+
+  const isAdmin = profile?.role === "admin";
 
   const isSolid = !isHome || scrolled;
 
@@ -139,7 +172,7 @@ export default function Navbar() {
                   <div className="absolute right-0 mt-2 w-56 rounded-md border bg-white shadow-lg">
                     <div className="px-4 py-3 border-b">
                       <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                        Logged in user
+                        {isAdmin ? "Logged in as admin" : "Logged in user"}
                       </p>
                       <p className="text-sm text-gray-700 truncate mt-1">
                         {user.email}
@@ -252,7 +285,7 @@ export default function Navbar() {
               <>
                 <div className="border-t pt-3 mt-2">
                   <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                    Logged in user
+                    {isAdmin ? "Logged in as admin" : "Logged in user"}
                   </div>
                   <div className="text-sm text-gray-600 truncate mb-3">
                     {user.email}
