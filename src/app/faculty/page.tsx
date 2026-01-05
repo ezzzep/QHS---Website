@@ -171,97 +171,117 @@ export default function FacultyPage() {
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-            {faculty.map((item, index) => (
-              <div
-                key={item.id}
-                className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-200 shadow-md group flex flex-col transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-                  reorderMode && isAdmin ? "cursor-move" : "cursor-pointer"
-                } ${
-                  dragOverItem?.id === item.id ? "ring-4 ring-green-400" : ""
-                }`}
-                draggable={reorderMode && isAdmin}
-                onDragStart={(e) => handleDragStart(e, item)}
-                onDragOver={(e) => handleDragOver(e, item)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, item)}
-              >
-                {reorderMode && isAdmin && (
-                  <div className="absolute top-2 left-2 z-10 bg-green-600 text-white rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center font-bold text-xs sm:text-sm shadow-lg">
-                    {index + 1}
-                  </div>
-                )}
+            {faculty.map((item, index) => {
+              const positions = item.position
+                .split(",")
+                .map((p) => p.trim())
+                .filter((p) => p);
 
-                <div className="relative aspect-[3/4] w-full flex-shrink-0">
-                  {item.image_url ? (
-                    <img
-                      src={item.image_url}
-                      alt={item.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <Image
-                      src="/images/school.jpg"
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                    />
+              return (
+                <div
+                  key={item.id}
+                  className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-200 shadow-md group flex flex-col transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                    reorderMode && isAdmin ? "cursor-move" : "cursor-pointer"
+                  } ${
+                    dragOverItem?.id === item.id ? "ring-4 ring-green-400" : ""
+                  }`}
+                  draggable={reorderMode && isAdmin}
+                  onDragStart={(e) => handleDragStart(e, item)}
+                  onDragOver={(e) => handleDragOver(e, item)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, item)}
+                >
+                  {reorderMode && isAdmin && (
+                    <div className="absolute top-2 left-2 z-10 bg-green-600 text-white rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center font-bold text-xs sm:text-sm shadow-lg">
+                      {index + 1}
+                    </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
 
-                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-                    <p className="text-base sm:text-md text-white leading-relaxed font-medium">
-                      {item.name}
-                    </p>
+                  <div className="relative aspect-[3/4] w-full flex-shrink-0">
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src="/images/school.jpg"
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
+
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                      <p className="text-base sm:text-md text-white leading-relaxed font-medium">
+                        {item.name}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="bg-black p-4 sm:p-6 flex-grow">
-                  <div className="border-t border-white/60 pt-3 sm:pt-4">
-                    <p className="text-green-300 font-semibold text-sm sm:text-sm tracking-wider whitespace-normal">
-                      {item.position}
-                    </p>
+                  <div className="bg-black p-4 sm:p-6 flex-grow">
+                    <div className="border-t border-white/60 pt-3 sm:pt-4">
+                      {positions.length > 0 ? (
+                        <div className="space-y-2">
+                          {positions.map((position, index) => (
+                            <div key={index} className="flex items-start">
+                              <span className="text-green-300 font-bold text-sm"></span>
+                              <p className="text-green-300 font-semibold text-xs sm:text-xs tracking-wider whitespace-normal">
+                                {position}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-green-300 font-semibold text-xs sm:text-xs tracking-wider whitespace-normal">
+                          {item.position}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {isAdmin && !reorderMode && (
-                  <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <button
-                      onClick={() => openEditModal(item)}
-                      className="bg-white text-blue-500 p-1.5 sm:p-2 rounded-full hover:bg-blue-500 hover:text-white transition-all duration-200 transform hover:scale-110 cursor-pointer shadow-md"
-                      title="Edit faculty member"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 sm:h-5 sm:w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+                  {isAdmin && !reorderMode && (
+                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <button
+                        onClick={() => openEditModal(item)}
+                        className="bg-white text-blue-500 p-1.5 sm:p-2 rounded-full hover:bg-blue-500 hover:text-white transition-all duration-200 transform hover:scale-110 cursor-pointer shadow-md"
+                        title="Edit faculty member"
                       >
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg>
-                    </button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 sm:h-5 sm:w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </button>
 
-                    <button
-                      onClick={() => deleteFaculty(item.id)}
-                      className="bg-white text-red-500 p-1.5 sm:p-2 rounded-full hover:bg-red-500 hover:text-white transition-all duration-200 transform hover:scale-110 cursor-pointer shadow-md"
-                      title="Delete faculty member"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 sm:h-5 sm:w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+                      <button
+                        onClick={() => deleteFaculty(item.id)}
+                        className="bg-white text-red-500 p-1.5 sm:p-2 rounded-full hover:bg-red-500 hover:text-white transition-all duration-200 transform hover:scale-110 cursor-pointer shadow-md"
+                        title="Delete faculty member"
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 sm:h-5 sm:w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
 
             {faculty.length === 0 && (
               <div className="col-span-full text-center py-12">
