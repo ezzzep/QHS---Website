@@ -59,10 +59,10 @@ export default function Footer() {
                 <Link href="/">Home</Link>
               </li>
               <li>
-                <Link href="/about">About Us</Link>
+                <Link href="/faculty">Admin & Faculty</Link>
               </li>
               <li>
-                <Link href="/contact">Contact</Link>
+                <Link href="/tuition">Tuition Fees</Link>
               </li>
             </ul>
           </div>
@@ -70,13 +70,14 @@ export default function Footer() {
           <div className="md:text-right">
             <ul className="space-y-4 text-gray-900 font-bold">
               <li>
-                <Link href="/faculty">Admin & Faculty</Link>
+                <Link href="/about">About Us</Link>
+              </li>
+
+              <li>
+                <Link href="/contact">Contact</Link>
               </li>
               <li>
-                <Link href="/tuition">Tuition Fees</Link>
-              </li>
-              <li>
-                <Link href="/login">Login</Link>
+                <Link href="/alumni">Alumni</Link>
               </li>
             </ul>
 

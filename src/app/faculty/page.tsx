@@ -243,7 +243,7 @@ export default function FacultyPage() {
                   </div>
 
                   {isAdmin && !reorderMode && (
-                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">
                       <button
                         onClick={() => openEditModal(item)}
                         className="bg-white text-blue-500 p-1.5 sm:p-2 rounded-full hover:bg-blue-500 hover:text-white transition-all duration-200 transform hover:scale-110 cursor-pointer shadow-md"
